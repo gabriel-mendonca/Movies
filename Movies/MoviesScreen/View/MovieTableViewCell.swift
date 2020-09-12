@@ -69,7 +69,6 @@ class MovieTableViewCell: UITableViewCell,UICollectionViewDataSource,UICollectio
       func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
           
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! MovieCollectionViewCell
-        cell.cornerRadiusPoster()
         cell.image(url: movieTableViewCellViewModel.get(at: indexPath.row))
         cell.setupPosterImageView()
         cell.contentView.backgroundColor = .clear

@@ -14,7 +14,7 @@ class MovieViewController: UIViewController,UIScrollViewDelegate,MovieCollection
     var movieTableViewCellViewModel: MovieTableViewCellViewModel = MovieTableViewCellViewModel()
     private let layout = UICollectionViewFlowLayout()
     let screenHeight = UIScreen.main.bounds.height
-    let scrollviewContentHeight = 4400 as CGFloat
+//    let scrollviewContentHeight = 4400 as CGFloat //4400
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -32,6 +32,7 @@ class MovieViewController: UIViewController,UIScrollViewDelegate,MovieCollection
     
     override func viewDidAppear(_ animated: Bool) {
         collectionViewPopular.reloadData()
+        tableView.reloadData()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -41,7 +42,7 @@ class MovieViewController: UIViewController,UIScrollViewDelegate,MovieCollection
     override func viewWillDisappear(_ animated: Bool) {
         self.navigationController?.navigationBar.isHidden = false
     }
-    
+
     lazy var label: UILabel = {
        var title = UILabel()
         title.textColor = .white
@@ -69,7 +70,7 @@ class MovieViewController: UIViewController,UIScrollViewDelegate,MovieCollection
     
     lazy var tableView: UITableView = {
        var table = UITableView()
-        table.isScrollEnabled = false
+//        table.isScrollEnabled = false
         table.bounces = false
         table.backgroundColor = .black
         scroll.addSubview(table)
@@ -83,24 +84,31 @@ class MovieViewController: UIViewController,UIScrollViewDelegate,MovieCollection
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-   
-        let yOffset = scroll.contentOffset.y
         
-        if scroll == self.scroll {
-            if yOffset >= scrollviewContentHeight - screenHeight {
-                scroll.isScrollEnabled = false
-                tableView.isScrollEnabled = true
-                self.tableView.reloadData()
-            }
+        if scrollView == self.scroll {
+            tableView.isScrollEnabled = (self.scroll.contentOffset.y >= 285)
         }
-        
-        if scroll == self.tableView {
-            if yOffset <= 0 {
-                self.scroll.isScrollEnabled = true
-                self.tableView.isScrollEnabled = false
-                self.tableView.reloadData()
-            }
+        if scrollView == tableView {
+            tableView.isScrollEnabled = (self.tableView.contentOffset.y > 0)
         }
+
+//        let yOffset = scroll.contentOffset.y
+//
+//        if scrollView == self.scroll {
+//            if yOffset >= scrollviewContentHeight - screenHeight {
+//                scroll.isScrollEnabled = false
+//                tableView.isScrollEnabled = true
+//                self.tableView.reloadData()
+//            }
+//        }
+//
+//        if scrollView == self.tableView {
+//            if yOffset <= 0 {
+//                self.scroll.isScrollEnabled = true
+//                self.tableView.isScrollEnabled = false
+//                self.tableView.reloadData()
+//            }
+//        }
     }
     
     func setupContraints() {
@@ -110,7 +118,7 @@ class MovieViewController: UIViewController,UIScrollViewDelegate,MovieCollection
         let leadingScroll = scroll.leadingAnchor.constraint(equalTo: view.leadingAnchor)
         let trailingScroll = scroll.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         let bottomScroll = scroll.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-        let heightScroll = scroll.heightAnchor.constraint(equalToConstant: 1200.0)
+        let heightScroll = scroll.heightAnchor.constraint(equalToConstant: view.frame.height)//1200.0
         NSLayoutConstraint.activate([topScroll,leadingScroll,trailingScroll,bottomScroll,heightScroll])
         view.addSubview(scroll)
         
@@ -125,9 +133,8 @@ class MovieViewController: UIViewController,UIScrollViewDelegate,MovieCollection
         let bottom = tableView.bottomAnchor.constraint(equalTo: scroll.bottomAnchor)
         let trailing = tableView.trailingAnchor.constraint(equalTo: scroll.trailingAnchor)
         let leading = tableView.leadingAnchor.constraint(equalTo: scroll.leadingAnchor)
-        let heightTable = tableView.heightAnchor.constraint(equalToConstant: 3900.0)
-        let widthTable = tableView.widthAnchor.constraint(equalToConstant: view.frame.width)
-        NSLayoutConstraint.activate([top,bottom,trailing,leading,heightTable,widthTable])
+        let heightTable = tableView.heightAnchor.constraint(equalToConstant: view.frame.height) //3900.0
+        NSLayoutConstraint.activate([top,bottom,trailing,heightTable,leading])
         scroll.addSubview(tableView)
         
         collectionViewPopular.translatesAutoresizingMaskIntoConstraints = false
@@ -180,7 +187,7 @@ extension MovieViewController: UICollectionViewDelegateFlowLayout,UICollectionVi
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! MoviePopularCollectionViewCell
-        cell.cornerRadiusPoster1()
+//        cell.cornerRadiusPoster1()
         cell.imagem(url: movieTableViewCellViewModel.get(at: indexPath.row))
         cell.setupContraints()
         cell.contentView.backgroundColor = .clear
@@ -198,16 +205,5 @@ extension MovieViewController: UICollectionViewDelegateFlowLayout,UICollectionVi
         let movieDescriptionViewController = MovieDescriptionViewController(movieDescriptionViewModel: movieDescriptionViewModel)
          present(movieDescriptionViewController, animated: true, completion: nil)
     }
-
-    
-    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        let title = UILabel()
-        title.textColor = .white
-        
-        return title
-        
-        
-    }
-    
     
 }

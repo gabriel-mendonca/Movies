@@ -128,21 +128,21 @@ class SearchViewController: UIViewController,UISearchBarDelegate,UICollectionVie
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
 
-        switch indexPath.row {
-        case indexPath.row:
-            
-            let serieDescriptionViewModel = SerieDescriptionViewModel(id: searchViewModel.searchMovie[indexPath.row].id ?? 0)
-            let serieDescriptionViewController = SerieDescriptionViewController(serieDescriptionViewModel: serieDescriptionViewModel)
-            present(serieDescriptionViewController, animated: true, completion: nil)
-
-        case indexPath.row:
+//        switch indexPath.row {
+//        case indexPath.row:
+//
+//            let serieDescriptionViewModel = SerieDescriptionViewModel(id: searchViewModel.searchMovie[indexPath.row].id ?? 0)
+//            let serieDescriptionViewController = SerieDescriptionViewController(serieDescriptionViewModel: serieDescriptionViewModel)
+//            present(serieDescriptionViewController, animated: true, completion: nil)
+//
+//        case indexPath.row:
             let movieDescriptionViewModel = MovieDescriptionViewModel(id: searchViewModel.searchMovie[indexPath.row].id ?? 0)
             let movieDescriptionViewController = MovieDescriptionViewController(movieDescriptionViewModel: movieDescriptionViewModel)
             present(movieDescriptionViewController, animated: true, completion: nil)
 
-        default:
-            break
-        }
+//        default:
+//            break
+//        }
         
         
     }

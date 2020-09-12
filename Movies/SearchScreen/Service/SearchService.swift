@@ -50,10 +50,12 @@ extension NetworkServiceSearch {
     
     func serviceSearch(query: String) -> String {
     
-        let service = "https://api.themoviedb.org/3/search/multi?api_key=68206fe24af296b2560c51089250d615&language=pt-BR&query=\(query)&page=1&include_adult=false"
+        let service = "https://api.themoviedb.org/3/search/movie?api_key=68206fe24af296b2560c51089250d615&language=pt-BR&query=\(query)&page=1&include_adult=false"
         
         return service
         
     }
+    
+    //"https://api.themoviedb.org/3/search/multi?api_key=68206fe24af296b2560c51089250d615&language=pt-BR&query=\(query)&page=1&include_adult=false"
     
 }

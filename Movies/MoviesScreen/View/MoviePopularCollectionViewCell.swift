@@ -12,10 +12,15 @@ import UIKit
 class MoviePopularCollectionViewCell: UICollectionViewCell {
     
     weak var delegate: MoviePopularCollectionViewDelegate?
+    
+    override class func awakeFromNib() {
+        super.awakeFromNib()
+        
+    }
 
     lazy var poster: UIImageView = {
        var image = UIImageView()
-        contentView.addSubview(image)
+        addSubview(image)
         return image
     }()
 
@@ -30,17 +35,21 @@ class MoviePopularCollectionViewCell: UICollectionViewCell {
         contentView.addSubview(poster)
     }
     
-    func cornerRadiusPoster1() {
-        poster.clipsToBounds = true
-        poster.layer.cornerRadius = poster.frame.size.width/12.5
-    }
-    
     func imagem(url: URL?) {
         if let url = url {
             poster.sd_setImage(with: url) { (image, error, _, url) in
                 
             }
         }
+    }
+    
+    override func prepareForReuse() {
+        poster.image = nil
+    }
+    
+    func cornerRadiusPoster1() {
+        poster.clipsToBounds = true
+        poster.layer.cornerRadius = poster.frame.size.width/12.5
     }
 }
 
