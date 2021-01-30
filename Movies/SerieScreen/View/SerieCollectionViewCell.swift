@@ -47,10 +47,20 @@ class SerieCollectionViewCell: UICollectionViewCell {
         if let url = url {
             posterImageView.sd_setImage(with: url) { (image, error, _, url) in
                 self.progressLoad.stopAnimating()
+                self.cornerRadiusPoster()
             }
         } else {
             
         }
+    }
+    
+    func cornerRadiusPoster() {
+        posterImageView.clipsToBounds = true
+        posterImageView.layer.cornerRadius = posterImageView.frame.size.width/12.5
+    }
+    
+    override func prepareForReuse() {
+        posterImageView.image = nil
     }
     
 }

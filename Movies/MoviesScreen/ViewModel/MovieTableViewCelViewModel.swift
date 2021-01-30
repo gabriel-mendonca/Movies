@@ -8,6 +8,10 @@
 
 import Foundation
 
+protocol MovieCollectionViewCellDelegate: AnyObject {
+    func cellTapped(movie: Movie)
+}
+
 class MovieTableViewCellViewModel {
     
     var service: MovieEndPoint = TheMovieDb()

@@ -8,6 +8,8 @@
 
 import Foundation
 import UIKit
+import AVFoundation
+import AVKit
 
 class MovieDescriptionViewController: UIViewController {
     
@@ -23,6 +25,9 @@ class MovieDescriptionViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
+        movieDescriptionViewModel.fetchMovieVideo {_ in
+            self.removeButton()
+        }
         movieDescriptionViewModel.fetchMovieDescription(sucess: { (movieDescription) in
             self.setup(description: movieDescription)
         }, failure: {})
@@ -110,6 +115,37 @@ class MovieDescriptionViewController: UIViewController {
         return label
     }()
     
+    lazy var buttonVideo: UIButton = {
+        var video = UIButton()
+        video.setTitle("Trailer", for: .normal)
+        video.backgroundColor = .black
+        video.tintColor = .white
+        video.addTarget(self, action: #selector(play), for: .touchUpInside)
+        scrollView.addSubview(video)
+        return video
+    }()
+    
+    @objc func play() {
+        YoutubeTrailer()
+    }
+    
+    func YoutubeTrailer() {
+        
+        let count = movieDescriptionViewModel.video.count
+        if count > 0 {
+            for index in 0..<count {
+                let controller = YoutuberViewController()
+                controller.getVideo(code: movieDescriptionViewModel.video[index].key)
+                present(controller, animated: true)
+            }
+        }
+    }
+    
+    func removeButton() {
+
+        buttonVideo.isHidden = movieDescriptionViewModel.video.count > 0 ? false : true
+        
+    }
     
     func setupContraints() {
         
@@ -171,9 +207,16 @@ class MovieDescriptionViewController: UIViewController {
         let topSynopse = synopse.topAnchor.constraint(equalTo: releaseDate.bottomAnchor,constant: 20)
         let leadingSynopse = synopse.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor,constant: 20)
         let trailingSynopse = synopse.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor,constant: -20)
-        let bottomSynopse = synopse.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor,constant: -20)
-        NSLayoutConstraint.activate([topSynopse,leadingSynopse,trailingSynopse,bottomSynopse])
+        NSLayoutConstraint.activate([topSynopse,leadingSynopse,trailingSynopse])
         scrollView.addSubview(synopse)
+        
+        buttonVideo.translatesAutoresizingMaskIntoConstraints = false
+        let topVideo = buttonVideo.topAnchor.constraint(equalTo: synopse.bottomAnchor,constant: 20)
+        let leadingVideo = buttonVideo.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor,constant: 20)
+        let trailingVideo = buttonVideo.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor,constant: -20)
+        let bottomVideo = buttonVideo.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor, constant: -20)
+        NSLayoutConstraint.activate([topVideo,leadingVideo,trailingVideo,bottomVideo])
+        scrollView.addSubview(buttonVideo)
         
     }
     

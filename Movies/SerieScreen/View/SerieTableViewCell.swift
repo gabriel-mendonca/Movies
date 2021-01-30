@@ -79,8 +79,8 @@ class SerieTableViewCell: UITableViewCell,UICollectionViewDelegateFlowLayout,UIC
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let height = 125
-        let width = 100
+        let height = 187
+        let width = 126
         return CGSize(width: width, height: height)
     }
     

@@ -7,10 +7,13 @@
 //
 
 import Foundation
+import AVFoundation
+import AVKit
 
 class MovieDescriptionViewModel {
     
     var service: DescriptionEndPoint = ServiceDescriptionMovie()
+    var video = [MovieVideo]()
     var id: Int
     var urlMovieDescriptionLink: URL?
     var descriptionFirebase: MovieDescription?
@@ -19,8 +22,6 @@ class MovieDescriptionViewModel {
     init(id: Int) {
         self.id = id
     }
-    
-    
     
     func fetchMovieDescription(sucess: @escaping( _ MovieDescription: MovieDescription) -> Void, failure: @escaping () -> Void) {
         service.fetchMovieDescription(id: id) { (result) in
@@ -39,6 +40,20 @@ class MovieDescriptionViewModel {
             failure()
         }
     }
+    
+    func fetchMovieVideo(sucess: @escaping(_ movieVideo: [MovieVideo]) -> Void) {
+        service.fetchMovieVideo(id: id) { (result) in
+            switch result {
+            case .sucess(let movieVideo):
+                let videoSucess = movieVideo
+                self.video = videoSucess
+                sucess(videoSucess)
+            case .failure:
+                self.handleError()
+            }
+        }
+    }
+
     
     private func handleError() {}
     
@@ -60,5 +75,5 @@ class MovieDescriptionViewModel {
         guard let url = URL(string: homePage ) else { return }
         urlMovieDescriptionLink = url
     }
-    
 }
+

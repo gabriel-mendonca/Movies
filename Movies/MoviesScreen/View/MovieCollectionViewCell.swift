@@ -12,9 +12,10 @@ import SDWebImage
 
 class MovieCollectionViewCell: UICollectionViewCell {
     
+//    weak var delegate: MoviePopularCollectionViewDelegate?
+    
     override func awakeFromNib() {
         super.awakeFromNib()
-        cornerRadiusPoster()
     }
     
     lazy var posterImageView: UIImageView = {
@@ -47,14 +48,12 @@ class MovieCollectionViewCell: UICollectionViewCell {
         contentView.addSubview(prgressLoad)
         
     }
-    override func prepareForReuse() {
-        posterImageView.image = nil
-    }
     
     func image(url: URL?) {
         if let url = url {
             posterImageView.sd_setImage(with: url) { (image, error, _, url) in
                 self.prgressLoad.stopAnimating()
+                self.cornerRadiusPoster()
             }
         }
     }
@@ -63,8 +62,8 @@ class MovieCollectionViewCell: UICollectionViewCell {
         posterImageView.clipsToBounds = true
         posterImageView.layer.cornerRadius = posterImageView.frame.size.width/12.5
     }
-}
-
-protocol MovieCollectionViewCellDelegate: AnyObject {
-    func cellTapped(movie: Movie)
+    
+    override func prepareForReuse() {
+        posterImageView.image = nil
+    }
 }

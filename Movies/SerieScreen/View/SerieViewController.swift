@@ -20,6 +20,16 @@ class SerieViewController: UIViewController,UITableViewDataSource,UITableViewDel
         setupSerieTableView()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        serieViewModel.setupSerieTableView {
+            DispatchQueue.main.async {
+                self.tableView.reloadData()
+            }
+        }
+    }
+    
 //    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
 //        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
 //    }
@@ -56,12 +66,11 @@ class SerieViewController: UIViewController,UITableViewDataSource,UITableViewDel
         tableView.delegate = self
         tableView.dataSource = self
         tableView.register(SerieTableViewCell.self, forCellReuseIdentifier: "cell")
-        
-        serieViewModel.setupSerieTableView {
-            DispatchQueue.main.async {
-                self.tableView.reloadData()
-            }
-        } 
+            
+            let view = SeriePopularheaderView()
+            view.frame = CGRect(x: 0, y: 10, width: tableView.frame.width, height: 320)
+            view.delegate = self
+            tableView.tableHeaderView = view
     }
   
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -80,7 +89,7 @@ class SerieViewController: UIViewController,UITableViewDataSource,UITableViewDel
        }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 170
+        return 250
     }
        
        

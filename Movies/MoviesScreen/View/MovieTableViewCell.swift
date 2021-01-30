@@ -54,13 +54,10 @@ class MovieTableViewCell: UITableViewCell,UICollectionViewDataSource,UICollectio
     lazy var collectionView: UICollectionView = {
         var collection = UICollectionView(frame: .zero, collectionViewLayout: layout )
         layout.scrollDirection = .horizontal
+        layout.sectionInset = UIEdgeInsets(top: 10, left: 5, bottom: 5, right: 0)
         contentView.addSubview(collection)
         return collection
     }()
-    
-//    func numberOfSections(in collectionView: UICollectionView) -> Int {
-//        return movieTableViewCellViewModel.numberOfMovies()
-//    }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return movieTableViewCellViewModel.numberOfMovies()

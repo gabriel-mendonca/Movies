@@ -28,12 +28,6 @@ enum Erro {
     case parseError(error: String)
 }
 
-protocol MovieEndPoint {
-    func fetchGenreMovie(id: Int, completion: @escaping ( _ result: resultGenreMovie) -> Void)
-    func fetchNameGenre(completion: @escaping ( _ result: resultNameGenre) -> Void)
-    func fetchMoviePopular(completion: @escaping (_ result: resultMoviePopular) -> Void)
-}
-
 class TheMovieDb: MovieEndPoint {
     
     func fetchGenreMovie(id: Int, completion: @escaping ( _ result: resultGenreMovie) -> Void) {

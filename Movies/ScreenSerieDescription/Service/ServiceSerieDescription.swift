@@ -13,10 +13,6 @@ enum ResultSerieDescription {
     case failure(error: ErrorSerie)
 }
 
-protocol SerieDescriptionEndPoint {
-    func fetchSerieDescription(id: Int, completion: @escaping(_ result: ResultSerieDescription) -> Void)
-}
-
 class ServiceSerieDescription: SerieDescriptionEndPoint {
     
 func fetchSerieDescription(id: Int, completion: @escaping(_ result: ResultSerieDescription) -> Void) {

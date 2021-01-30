@@ -15,7 +15,7 @@ enum resultMovieSearch {
 
 class NetworkServiceSearch {
     
-    func fetchMovieSearch(query: String, completion: @escaping( _ result: resultMovieSearch) -> Void) {
+    func fetchMultiSearch(query: String, completion: @escaping( _ result: resultMovieSearch) -> Void) {
         var movieSearch = [MovieSearch]()
         
         guard let url = URL(string: serviceSearch(query: query) ) else {
@@ -28,6 +28,7 @@ class NetworkServiceSearch {
                         guard let data = data else {return}
 
                         let movies = try JSONDecoder().decode(SearchMovieResult.self, from: data)
+                        print("JSONNNN = ", movies)
                         movieSearch = movies.results
                         completion(resultMovieSearch.sucess(movieSearch: movieSearch))
                     } catch {
@@ -50,11 +51,13 @@ extension NetworkServiceSearch {
     
     func serviceSearch(query: String) -> String {
     
-        let service = "https://api.themoviedb.org/3/search/movie?api_key=68206fe24af296b2560c51089250d615&language=pt-BR&query=\(query)&page=1&include_adult=false"
+        let service = "https://api.themoviedb.org/3/search/multi?api_key=68206fe24af296b2560c51089250d615&language=pt-BR&query=\(query)&page=1&include_adult=false"
         
         return service
         
     }
+    
+//    https://api.themoviedb.org/3/search/movie?api_key=68206fe24af296b2560c51089250d615&language=pt-BR&query=\(query)&page=1&include_adult=false
     
     //"https://api.themoviedb.org/3/search/multi?api_key=68206fe24af296b2560c51089250d615&language=pt-BR&query=\(query)&page=1&include_adult=false"
     

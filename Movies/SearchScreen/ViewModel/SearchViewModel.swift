@@ -45,7 +45,7 @@ class SearchViewModel {
     
     
     func setupSearchTableView(query: String) {
-        service.fetchMovieSearch(query: query) { (result) in
+        service.fetchMultiSearch(query: query) { (result) in
             switch result {
             case .sucess(let movie):
                 self.searchMovie = movie

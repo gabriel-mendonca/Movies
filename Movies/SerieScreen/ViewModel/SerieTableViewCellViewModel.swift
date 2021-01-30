@@ -35,6 +35,19 @@ class SerieTableViewCellViewModel {
         }
     }
     
+    func setupSeriePopular(completion: @escaping () -> Void) {
+        service.fetchSeriePoupular { (result) in
+            switch result {
+            case .sucess(let listGenre):
+                self.genreSerie = listGenre
+                completion()
+            case .failure:
+                self.handleError()
+                completion()
+            }
+        }
+    }
+    
     private func handleError() {
         
     }

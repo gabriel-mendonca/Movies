@@ -19,6 +19,7 @@ class SerieDescriptionViewController: UIViewController {
         
         setupCollection()
         setupContraints()
+//        collectionViewSeasons.reloadData()
         view.backgroundColor = .white
         
     }
@@ -27,10 +28,11 @@ class SerieDescriptionViewController: UIViewController {
         super.viewWillAppear(true)
         serieDescriptionViewModell.fetchSerieDescription(sucess: { (serieDescription) in
             self.setup(serieDescription: serieDescription)
-        }, failure: {})
-        DispatchQueue.main.async {
             self.collectionViewSeasons.reloadData()
-        }
+        }, failure: {})
+//        DispatchQueue.main.async {
+//            self.collectionViewSeasons.reloadData()
+//        }
     }
     
     init(serieDescriptionViewModel: SerieDescriptionViewModel) {
@@ -201,6 +203,7 @@ class SerieDescriptionViewController: UIViewController {
         
         collectionViewSeasons.delegate = self
         collectionViewSeasons.dataSource = self
+//        collectionViewSeasons.reloadData()
         collectionViewSeasons.register(SerieDescriptionCollectionViewCell.self, forCellWithReuseIdentifier: "cell")
         
     }

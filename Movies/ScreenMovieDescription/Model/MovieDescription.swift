@@ -61,14 +61,14 @@ struct MovieDescription: Codable, ConvertPosterLink, ConvertBackdropLink {
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: MovieKey.self)
         let adult: Bool = try container.decode(Bool.self, forKey: .adult)
-        let backdropPath: String? = try container.decode(String.self, forKey: .backdropPath)
-        let voteAverage: Float? = try container.decode(Float.self, forKey: .voteAverage)
-        let releaseDate: String? = try container.decode(String.self, forKey: .releaseDate)
-        let overview: String? = try container.decode(String.self, forKey: .overview)
-        let tagline: String? = try container.decode(String.self, forKey: .tagline)
-        let title: String? = try container.decode(String.self, forKey: .title)
-        let homepage: String? = try container.decode(String.self, forKey: .homepage)
-        let posterPath: String? = try container.decode(String.self, forKey: .posterPath)
+        let backdropPath: String? = try container.decodeIfPresent(String.self, forKey: .backdropPath)
+        let voteAverage: Float? = try container.decodeIfPresent(Float.self, forKey: .voteAverage)
+        let releaseDate: String? = try container.decodeIfPresent(String.self, forKey: .releaseDate)
+        let overview: String? = try container.decodeIfPresent(String.self, forKey: .overview)
+        let tagline: String? = try container.decodeIfPresent(String.self, forKey: .tagline)
+        let title: String? = try container.decodeIfPresent(String.self, forKey: .title)
+        let homepage: String? = try container.decodeIfPresent(String.self, forKey: .homepage)
+        let posterPath: String? = try container.decodeIfPresent(String.self, forKey: .posterPath)
         self.init(adult: adult, backdropPath: backdropPath, voteAverage: voteAverage, releaseDate: releaseDate, overview: overview, tagline: tagline, title: title, homepage: homepage, posterPath: posterPath)
     }
 }

@@ -47,10 +47,20 @@ class SearchCollectionViewCell: UICollectionViewCell {
         if let url = url {
             poster.sd_setImage(with: url) { (image, error, _, URL) in
                 self.activity.stopAnimating()
+                self.cornerRadiusPoster()
             }
         } else {
             
         }
+    }
+    
+    func cornerRadiusPoster() {
+        poster.clipsToBounds = true
+        poster.layer.cornerRadius = poster.frame.size.width/12.5
+    }
+    
+    override func prepareForReuse() {
+        poster.image = nil
     }
     
 }
