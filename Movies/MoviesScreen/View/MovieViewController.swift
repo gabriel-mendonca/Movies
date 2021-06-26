@@ -9,8 +9,12 @@
 import UIKit
 
 class MovieViewController: UIViewController,UIScrollViewDelegate,MovieCollectionViewCellDelegate {
+    func cellTappedRecommendation(_ movie: Movie) {
+    }
+    
     
     var movieViewModel: MovieViewModel = MovieViewModel()
+    var movieTableViewCellViewModel: MovieTableViewCellViewModel!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -20,32 +24,37 @@ class MovieViewController: UIViewController,UIScrollViewDelegate,MovieCollection
     }
     
     override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
         tableView.reloadData()
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        hideNavigationBar(animated)
         movieViewModel.setUpViewController {
             self.tableView.reloadData()
         }
-        self.navigationController?.navigationBar.isHidden = true
     }
     
-    override func viewWillDisappear(_ animated: Bool) {
-        self.navigationController?.navigationBar.isHidden = false
+    init(viewModel: MovieTableViewCellViewModel) {
+        self.movieTableViewCellViewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     lazy var tableView: UITableView = {
        var table = UITableView()
         table.bounces = false
+        table.allowsSelection = false
         table.backgroundColor = .black
         view.addSubview(table)
         return table
     }()
     
     func cellTapped(movie: Movie) {
-        let movieDescriptionViewModel = MovieDescriptionViewModel(id: movie.id ?? 0)
-        let movieDescriptionViewController = MovieDescriptionViewController(movieDescriptionViewModel: movieDescriptionViewModel)
-         present(movieDescriptionViewController, animated: true, completion: nil)
+        movieTableViewCellViewModel.showMovieDescription(movie)
     }
     
     func setupContraints() {

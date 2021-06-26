@@ -10,6 +10,7 @@ import Foundation
 
 protocol MovieCollectionViewCellDelegate: AnyObject {
     func cellTapped(movie: Movie)
+    func cellTappedRecommendation(_ movie: Movie)
 }
 
 class MovieTableViewCellViewModel {
@@ -17,6 +18,21 @@ class MovieTableViewCellViewModel {
     var service: MovieEndPoint = TheMovieDb()
     var listGenreMovie = [Movie]()
     var id = 0
+    weak var delegate: MovieCollectionViewCellDelegate?
+    var childCoordinator: MovieCoordinator
+    
+    init(coordinator: MovieCoordinator) {
+        self.childCoordinator = coordinator
+        delegate = coordinator
+    }
+    
+    func showMovieDescription(_ movie: Movie) {
+        delegate?.cellTapped(movie: movie)
+    }
+    
+    func showMovieRecommendation(_ movie: Movie) {
+        delegate?.cellTappedRecommendation(movie)
+    }
     
     func numberOfMovies() -> Int {
         return listGenreMovie.count

@@ -11,7 +11,7 @@ import UIKit
 
 class MovieTableViewCell: UITableViewCell,UICollectionViewDataSource,UICollectionViewDelegateFlowLayout {
     
-    var movieTableViewCellViewModel: MovieTableViewCellViewModel = MovieTableViewCellViewModel()
+    var movieTableViewCellViewModel: MovieTableViewCellViewModel = MovieTableViewCellViewModel(coordinator: MovieCoordinator())
     weak var delegate: MovieCollectionViewCellDelegate?
     let layout = UICollectionViewFlowLayout()
     

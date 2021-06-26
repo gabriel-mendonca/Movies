@@ -14,10 +14,10 @@ struct MovieReponse: Codable {
 }
 
 struct MovieVideo: Codable {
-    let id: String
-    let key: String
+    let id: String?
+    let key: String?
 
-    init(id: String, key: String) {
+    init(id: String?, key: String?) {
         self.id = id
         self.key = key
     }
@@ -31,7 +31,7 @@ struct MovieVideo: Codable {
         let container = try decoder.container(keyedBy: MovieVideoKeys.self)
         let id: String? = try container.decodeIfPresent(String.self, forKey: .id)
         let key: String? = try container.decodeIfPresent(String.self, forKey: .key)
-        self.init(id: id!, key: key!)
+        self.init(id: id, key: key)
     }
     
 }

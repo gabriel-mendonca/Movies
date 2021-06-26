@@ -64,7 +64,3 @@ class SerieCollectionViewCell: UICollectionViewCell {
     }
     
 }
-
-protocol SerieCollectionViewCellDelegate: AnyObject {
-    func cellTapped(serie: Serie)
-}

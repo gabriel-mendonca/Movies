@@ -9,16 +9,27 @@
 import Foundation
 import UIKit
 
+
+protocol SearchViewModelDelegate: AnyObject {
+    func sendToMovieOrSerie(indexPath: Int)
+}
+
 class SearchViewModel {
     var searchMovie = [MovieSearch]()
-    var searchSerie = [Serie]()
     var service = NetworkServiceSearch()
+    var childCoordinator: SearchCoordinator
+    weak var delegate: SearchViewModelDelegate?
     
-    init(service: NetworkServiceSearch = NetworkServiceSearch()) {
+    init(coordinator: SearchCoordinator, service: NetworkServiceSearch = NetworkServiceSearch()) {
         self.service = service
+        self.childCoordinator = coordinator
+        delegate = coordinator
         searchQuery = ""
     }
     
+    func goToMovieDescriptionOrSerieDescription(indexPath: Int) {
+        delegate?.sendToMovieOrSerie(indexPath: indexPath)
+    }
     var searchQuery: String{
         didSet {
            reloadSearch()
@@ -28,8 +39,6 @@ class SearchViewModel {
     func reloadSearch() {
         if searchQuery.isEmpty {
             setupSearchTableView(query: searchQuery)
-        }else {
-            
         }
     }
     

@@ -8,6 +8,15 @@
 
 import Foundation
 
+protocol ConvertBackdropLink {
+    var backdropPath: String? { get }
+    var backdropURL: URL? { get }
+}
+
+protocol ConvertPosterLink {
+    var posterPath: String? { get }
+    var posterURL: URL? { get }
+}
 
 protocol MovieEndPoint {
     func fetchGenreMovie(id: Int, completion: @escaping ( _ result: resultGenreMovie) -> Void)
@@ -17,6 +26,7 @@ protocol MovieEndPoint {
 
 protocol DescriptionEndPoint {
     func fetchMovieDescription(id: Int, completion: @escaping( _ result: resultMovieDescription) -> Void)
+    func fetchMovieRecommendations(id: Int, completion: @escaping(_ result: ResultRecommendation) -> Void)
     func fetchMovieVideo(id: Int, completion: @escaping(_ result: resultMovieVideo ) -> Void)
 }
 

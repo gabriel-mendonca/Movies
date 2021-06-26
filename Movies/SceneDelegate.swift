@@ -4,21 +4,29 @@
 //
 //  Created by Gabriel Mendonça on 09/07/20.
 //  Copyright © 2020 Gabriel Mendonça. All rights reserved.
-//
+
 
 import UIKit
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
+    var coordinator: TabBarCoordinator?
 
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else {return}
-        window = UIWindow(frame: UIScreen.main.bounds)
-        window?.windowScene = windowScene
-        window?.rootViewController = UINavigationController(rootViewController: TabBarController())
+//        let navController = UINavigationController()
+        let mainWindow = UIWindow(windowScene: windowScene)
+        window = mainWindow
+        coordinator = TabBarCoordinator(window: mainWindow)
+//        window = UIWindow(frame: UIScreen.main.bounds)
+//        window?.windowScene = windowScene
+//        window?.rootViewController = UINavigationController(rootViewController: TabBarController())
+//        mainWindow.rootViewController = navController
         window?.makeKeyAndVisible()
+        coordinator?.configTabBar()
+//        coordinator?.start(usingPresentation: .push(navigation: navController))
         guard let _ = (scene as? UIWindowScene) else { return }
     }
 

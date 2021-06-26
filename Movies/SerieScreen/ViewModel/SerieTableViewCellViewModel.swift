@@ -8,11 +8,27 @@
 
 import Foundation
 
+protocol SerieCollectionViewCellDelegate: AnyObject {
+    func cellTapped(_ model: Serie)
+}
+
+
 class SerieTableViewCellViewModel {
     
     var service = NetworkServiceSeries()
     var id = 0
     var genreSerie = [Serie]()
+    var childCoordinator: SerieCoordinator
+    public weak var delegate: SerieCollectionViewCellDelegate?
+    
+    init(coordinator: SerieCoordinator) {
+        self.childCoordinator = coordinator
+        delegate = coordinator
+    }
+    
+    func showSeries(model: Serie) {
+        delegate?.cellTapped(model)
+    }
     
     func numberOfSerie() -> Int {
         return genreSerie.count

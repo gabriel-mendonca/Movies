@@ -19,6 +19,11 @@ enum resultMovieVideo {
     case failure(error: Erro)
 }
 
+enum ResultRecommendation {
+    case sucess(movieRecommendation: [Movie])
+    case failure(error: Erro)
+}
+
 class ServiceDescriptionMovie: DescriptionEndPoint {
     
     func fetchMovieDescription(id: Int, completion: @escaping( _ result: resultMovieDescription) -> Void) {
@@ -36,6 +41,7 @@ class ServiceDescriptionMovie: DescriptionEndPoint {
                             }
                             
                             let descriptionMovie = try JSONDecoder().decode(MovieDescription.self, from: data)
+                            print("DESCRIPTIONN = ", descriptionMovie)
                             movie = descriptionMovie
                           completion(resultMovieDescription.sucess(movie: movie))
                         } catch {
@@ -60,6 +66,37 @@ class ServiceDescriptionMovie: DescriptionEndPoint {
         }
     }
     
+    func fetchMovieRecommendations(id: Int, completion: @escaping(_ result: ResultRecommendation) -> Void) {
+        var recommendations = [Movie]()
+        
+        guard let url = URL(string: serviceRecommendations(id: id)) else {
+            return
+        }
+        
+        URLSession.shared.dataTask(with: url) { (data, _, error) in
+            DispatchQueue.main.async {
+                if error == nil {
+                    do {
+                        guard let data = data else { return }
+                        let movieRecommendations = try JSONDecoder().decode(ListMovie.self, from: data)
+                        print("RECOMMENDATION = " , movieRecommendations)
+                        recommendations = movieRecommendations.results
+                        completion(ResultRecommendation.sucess(movieRecommendation: recommendations))
+                    } catch {
+                        if let data = data {
+                            let str = String(data: data, encoding: .utf8)
+                            print("DEUUU RUIMMM = ", error)
+                            print("Parse Error3", str as Any, error)
+                        } else {
+                            print("Parse Error3", error)
+                        }
+                        completion(ResultRecommendation.failure(error: Erro.parseError(error: "Erro no parse")))
+                    }
+                }
+            }
+        }.resume()
+    }
+    
     func fetchMovieVideo(id: Int, completion: @escaping(_ result: resultMovieVideo ) -> Void) {
         var movieVideo = [MovieVideo]()
 
@@ -73,7 +110,6 @@ class ServiceDescriptionMovie: DescriptionEndPoint {
                     do {
                         guard let data = data else { return }
                         let video = try JSONDecoder().decode(MovieReponse.self, from: data)
-                        print("Deuuuu Baoooo",video)
                             movieVideo = video.results
                             completion(resultMovieVideo.sucess(movieVideo: movieVideo))
                     } catch {
@@ -101,6 +137,11 @@ extension ServiceDescriptionMovie {
     func serviceMovieVideo(id: Int) -> String {
         let serviceVideo = "https://api.themoviedb.org/3/movie/\(id)/videos?api_key=68206fe24af296b2560c51089250d615&language=pt-BR"
         return serviceVideo
+    }
+    
+    func serviceRecommendations(id: Int) -> String {
+        let serviceRecommendation = "https://api.themoviedb.org/3/movie/\(id)/recommendations?api_key=68206fe24af296b2560c51089250d615&language=pt-BR&page=1"
+        return serviceRecommendation
     }
     
 }

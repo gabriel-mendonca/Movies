@@ -13,7 +13,7 @@ class SeriePopularheaderView: UIView,UICollectionViewDelegate,UICollectionViewDa
     
     private let layout = UICollectionViewFlowLayout()
     weak var delegate: SerieCollectionViewCellDelegate?
-    var serieTableViewCellViewModel: SerieTableViewCellViewModel = SerieTableViewCellViewModel()
+    var serieTableViewCellViewModel: SerieTableViewCellViewModel = SerieTableViewCellViewModel(coordinator: SerieCoordinator())
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -101,7 +101,7 @@ class SeriePopularheaderView: UIView,UICollectionViewDelegate,UICollectionViewDa
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if delegate != nil {
-            delegate?.cellTapped(serie: serieTableViewCellViewModel.genreSerie[indexPath.row])
+            delegate?.cellTapped(serieTableViewCellViewModel.genreSerie[indexPath.row])
         }
     }
     

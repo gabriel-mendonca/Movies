@@ -13,8 +13,8 @@ class SearchViewController: UIViewController,UISearchBarDelegate,UICollectionVie
     
     
     private let layout = UICollectionViewFlowLayout()
-    var searchViewModel: SearchViewModel = SearchViewModel()
-    var movieTableViewCellViewModel: MovieTableViewCellViewModel = MovieTableViewCellViewModel()
+    var searchViewModel: SearchViewModel!
+    var movieTableViewCellViewModel: MovieTableViewCellViewModel = MovieTableViewCellViewModel(coordinator: MovieCoordinator())
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -25,6 +25,20 @@ class SearchViewController: UIViewController,UISearchBarDelegate,UICollectionVie
         setupCollectionView()
         searchBar.delegate = self
         
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        hideNavigationBar(animated)
+        super.viewWillAppear(animated)
+    }
+    
+    init(viewModel: SearchViewModel) {
+        self.searchViewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     lazy var searchBar: UISearchBar = {
@@ -117,16 +131,19 @@ class SearchViewController: UIViewController,UISearchBarDelegate,UICollectionVie
     }
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         
-        if searchViewModel.searchMovie[indexPath.row].mediaType == "movie" {
-                let movieDescriptionViewModel = MovieDescriptionViewModel(id: self.searchViewModel.searchMovie[indexPath.row].id ?? 0)
-                let movieDescriptionViewController = MovieDescriptionViewController(movieDescriptionViewModel: movieDescriptionViewModel)
-                self.present(movieDescriptionViewController, animated: true, completion: nil)
-            
-        } else if searchViewModel.searchMovie[indexPath.row].mediaType == "tv" {
-            let serieDescriptionViewModel = SerieDescriptionViewModel(id: self.searchViewModel.searchMovie[indexPath.row].id ?? 0 )
-            let serieDescriptionViewController = SerieDescriptionViewController(serieDescriptionViewModel: serieDescriptionViewModel)
-            self.present(serieDescriptionViewController, animated: true, completion: nil)
-        }
+        searchViewModel.goToMovieDescriptionOrSerieDescription(indexPath: indexPath.row)
+        
+//        if searchViewModel.searchMovie[indexPath.row].mediaType == "movie" {
+//            let movieDescriptionViewModel = MovieDescriptionViewModel(id: self.searchViewModel.searchMovie[indexPath.row].id ?? 0, coordinator: MovieDescriptionCoordinator(id: 0))
+//                let movieDescriptionViewController = MovieDescriptionViewController(movieDescriptionViewModel: movieDescriptionViewModel)
+//            self.navigationController?.pushViewController(movieDescriptionViewController, animated: true)
+//
+//        } else if searchViewModel.searchMovie[indexPath.row].mediaType == "tv" {
+//            let serieDescriptionViewModel = SerieDescriptionViewModel(id: self.searchViewModel.searchMovie[indexPath.row].id ?? 0 )
+//            let serieDescriptionViewController = SerieDescriptionViewController(serieDescriptionViewModel: serieDescriptionViewModel)
+////            self.present(serieDescriptionViewController, animated: true, completion: nil)
+//            self.navigationController?.pushViewController(serieDescriptionViewController, animated: true)
+//        }
     }
 }
 

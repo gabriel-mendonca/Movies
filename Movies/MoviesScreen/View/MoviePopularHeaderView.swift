@@ -12,7 +12,7 @@ class MoviePopularHeaderView: UIView,UICollectionViewDelegate, UICollectionViewD
     
     private let layout = UICollectionViewFlowLayout()
     weak var delegate: MovieCollectionViewCellDelegate?
-    var movieTableViewCellViewModel: MovieTableViewCellViewModel = MovieTableViewCellViewModel()
+    var movieTableViewCellViewModel: MovieTableViewCellViewModel = MovieTableViewCellViewModel(coordinator: MovieCoordinator())
     
     override init(frame: CGRect) {
         super.init(frame: frame)

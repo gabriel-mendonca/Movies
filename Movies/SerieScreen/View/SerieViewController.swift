@@ -9,9 +9,10 @@
 import Foundation
 import UIKit
 
-class SerieViewController: UIViewController,UITableViewDataSource,UITableViewDelegate,SerieCollectionViewCellDelegate {
+class SerieViewController: UIViewController,UITableViewDataSource,UITableViewDelegate, SerieCollectionViewCellDelegate {
   
     var serieViewModel: SerieViewModel = SerieViewModel()
+    var serieTableViewCellViewModel: SerieTableViewCellViewModel!
    
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -21,8 +22,8 @@ class SerieViewController: UIViewController,UITableViewDataSource,UITableViewDel
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        hideNavigationBar(animated)
         super.viewWillAppear(animated)
-        
         serieViewModel.setupSerieTableView {
             DispatchQueue.main.async {
                 self.tableView.reloadData()
@@ -30,26 +31,26 @@ class SerieViewController: UIViewController,UITableViewDataSource,UITableViewDel
         }
     }
     
-//    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-//        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-//    }
-//
-//    required init?(coder: NSCoder) {
-//        fatalError("init(coder:) has not been implemented")
-//    }
+    init(viewModel: SerieTableViewCellViewModel) {
+        self.serieTableViewCellViewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
       lazy var tableView: UITableView = {
          var table = UITableView()
+        table.allowsSelection = false
         table.backgroundColor = .black
           view.addSubview(table)
           return table
       }()
-     
-    func cellTapped(serie: Serie) {
-        let serieDescriptionViewModel = SerieDescriptionViewModel(id: serie.id ?? 0)
-        let serieDescriptionViewController = SerieDescriptionViewController(serieDescriptionViewModel: serieDescriptionViewModel)
-        self.present(serieDescriptionViewController, animated: true, completion: nil)
-      }
+    
+    func cellTapped(_ model: Serie) {
+        serieTableViewCellViewModel.showSeries(model: model)
+    }
   
     func setupTableViewContraints() {
         tableView.translatesAutoresizingMaskIntoConstraints = false
@@ -81,9 +82,9 @@ class SerieViewController: UIViewController,UITableViewDataSource,UITableViewDel
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! SerieTableViewCell
         cell.cellConfigurate(name: serieViewModel.getSerie(at: indexPath.row).0)
         cell.serieTableViewCellViewModel.id = serieViewModel.getSerie(at: indexPath.row).1
-        cell.setupSerieCollectionView()
-        cell.setupSerieCollectionViewContraints()
+        cell.setupSerieCollectionView(view: self)
         cell.delegate = self
+        cell.setupSerieCollectionViewContraints()
         cell.backgroundColor = .black
         return cell
        }

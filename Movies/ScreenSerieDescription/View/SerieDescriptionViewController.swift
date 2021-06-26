@@ -11,7 +11,7 @@ import UIKit
 
 class SerieDescriptionViewController: UIViewController {
     
-    let serieDescriptionViewModell: SerieDescriptionViewModel
+    var serieDescriptionViewModell: SerieDescriptionViewModel!
     private let layout = UICollectionViewFlowLayout()
     
     override func viewDidLoad() {
@@ -19,8 +19,7 @@ class SerieDescriptionViewController: UIViewController {
         
         setupCollection()
         setupContraints()
-//        collectionViewSeasons.reloadData()
-        view.backgroundColor = .white
+        view.backgroundColor = UIColor(patternImage: UIImage(named: "backgroundOriginal")!)
         
     }
     
@@ -30,9 +29,6 @@ class SerieDescriptionViewController: UIViewController {
             self.setup(serieDescription: serieDescription)
             self.collectionViewSeasons.reloadData()
         }, failure: {})
-//        DispatchQueue.main.async {
-//            self.collectionViewSeasons.reloadData()
-//        }
     }
     
     init(serieDescriptionViewModel: SerieDescriptionViewModel) {
@@ -58,6 +54,14 @@ class SerieDescriptionViewController: UIViewController {
         return image
     }()
     
+    lazy var closeButton: UIButton = {
+       var close = UIButton()
+        close.setImage(UIImage(named: "closeButton"), for: .normal)
+        close.addTarget(self, action: #selector(exitDetails), for: .touchUpInside)
+        scrollView.addSubview(close)
+        return close
+    }()
+    
     lazy var poster: UIImageView = {
         var posterImage = UIImageView()
         scrollView.addSubview(posterImage)
@@ -66,7 +70,7 @@ class SerieDescriptionViewController: UIViewController {
     
     lazy var titleSerie: UILabel = {
         var label = UILabel()
-        label.textColor = .darkGray
+        label.textColor = .white
         label.font = UIFont(name: "Kefa", size: 20.0)
         label.lineBreakMode = .byWordWrapping
         label.numberOfLines = 0
@@ -76,7 +80,7 @@ class SerieDescriptionViewController: UIViewController {
     
     lazy var evaluation: UILabel = {
         var label = UILabel()
-        label.textColor = .darkGray
+        label.textColor = .white
         label.font = UIFont(name: "System", size: 17.0)
         scrollView.addSubview(label)
         return label
@@ -90,7 +94,7 @@ class SerieDescriptionViewController: UIViewController {
     
     lazy var numberSeason: UILabel = {
         var label = UILabel()
-        label.textColor = .darkGray
+        label.textColor = .white
         label.font = UIFont(name: "Kefa", size: 19.0)
         label.lineBreakMode = .byWordWrapping
         label.numberOfLines = 0
@@ -100,7 +104,7 @@ class SerieDescriptionViewController: UIViewController {
     
     lazy var numberEpsodes: UILabel = {
         var label = UILabel()
-        label.textColor = .darkGray
+        label.textColor = .white
         label.font = UIFont(name: "Kefa", size: 20.0)
         label.lineBreakMode = .byWordWrapping
         label.numberOfLines = 0
@@ -110,7 +114,7 @@ class SerieDescriptionViewController: UIViewController {
     
     lazy var synopse: UILabel = {
         var label = UILabel()
-        label.textColor = .darkGray
+        label.textColor = .white
         label.font = UIFont(name: "Kefa", size: 20.0)
         label.lineBreakMode = .byWordWrapping
         label.numberOfLines = 0
@@ -121,9 +125,17 @@ class SerieDescriptionViewController: UIViewController {
     lazy var collectionViewSeasons: UICollectionView = {
         var collection = UICollectionView(frame: .zero, collectionViewLayout: layout)
         layout.scrollDirection = .horizontal
-        collection.backgroundColor = .white
+        collection.backgroundColor = .clear
         scrollView.addSubview(collection)
         return collection
+    }()
+    
+    lazy var progressLoad: UIActivityIndicatorView = {
+        var activity = UIActivityIndicatorView(style: UIActivityIndicatorView.Style.medium)
+        activity.startAnimating()
+        activity.color = .white
+        scrollView.addSubview(activity)
+        return activity
     }()
     
     func setupContraints() {
@@ -151,6 +163,20 @@ class SerieDescriptionViewController: UIViewController {
         let widht = backdrop.widthAnchor.constraint(equalToConstant: view.frame.width)
         NSLayoutConstraint.activate([top,leading,trailing,height,widht])
         scrollView.addSubview(backdrop)
+        
+        progressLoad.translatesAutoresizingMaskIntoConstraints = false
+        let progressCenterY = progressLoad.centerYAnchor.constraint(equalTo: backdrop.centerYAnchor)
+        let progressCenterX = progressLoad.centerXAnchor.constraint(equalTo: backdrop.centerXAnchor)
+        NSLayoutConstraint.activate([progressCenterY,progressCenterX])
+        scrollView.addSubview(progressLoad)
+        
+        closeButton.translatesAutoresizingMaskIntoConstraints = false
+        let topButton = closeButton.topAnchor.constraint(equalTo: backdrop.topAnchor, constant: 10)
+        let trailingButton = closeButton.trailingAnchor.constraint(equalTo: backdrop.trailingAnchor, constant: -15)
+        let heightButton = closeButton.heightAnchor.constraint(equalToConstant: 30)
+        let widhtButton = closeButton.widthAnchor.constraint(equalToConstant: 30)
+        NSLayoutConstraint.activate([topButton, trailingButton,heightButton,widhtButton])
+        scrollView.addSubview(closeButton)
         
         poster.translatesAutoresizingMaskIntoConstraints = false
         let topPoster = poster.topAnchor.constraint(equalTo: backdrop.bottomAnchor,constant: -20)
@@ -199,6 +225,11 @@ class SerieDescriptionViewController: UIViewController {
         
     }
     
+    @objc func exitDetails() {
+        self.dismiss(animated: true, completion: nil)
+        navigationController?.popToRootViewController(animated: true)
+    }
+    
     func setupCollection() {
         
         collectionViewSeasons.delegate = self
@@ -215,9 +246,15 @@ class SerieDescriptionViewController: UIViewController {
         guard let episodes = serieDescription.numberEpisodes else {return}
         numberEpsodes.text = "Episódios: \(episodes)"
         guard let sinopse = serieDescription.overview else {return}
-        synopse.text = "Sinopse: \n Temporadas: \n \(sinopse)"
+        synopse.text = "Sinopse: \nTemporadas: \n\(sinopse)"
         starEvaluation(nota: serieDescription.voteAverage)
-        backdrop.sd_setImage(with: serieDescription.backdropURL)
+        if serieDescription.backdropURL != nil {
+            backdrop.sd_setImage(with: serieDescription.backdropURL)
+            progressLoad.stopAnimating()
+        } else {
+            backdrop.image = UIImage(named: "imagem indisponivel")
+            progressLoad.stopAnimating()
+        }
         poster.sd_setImage(with: serieDescription.posterURL)
     }
     
@@ -264,7 +301,8 @@ extension SerieDescriptionViewController: UICollectionViewDelegateFlowLayout,UIC
             return UICollectionViewCell() }
         cell.imageSeasons(serieDescription: serieDescriptionViewModell.serieDescription?.seasons?[indexPath.row])
         cell.setupContraints()
-        cell.title.textColor = .black
+        cell.title.textColor = .white
+        cell.progressLoad.color = .white
         return cell
     }
     

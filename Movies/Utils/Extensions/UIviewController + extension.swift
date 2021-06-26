@@ -11,6 +11,23 @@ import UIKit
 
 extension UIViewController {
     
+    
+    private static func genrericInstance<T: UIViewController>() -> T {
+        return T.init(nibName: String(describing: self), bundle: Bundle(for: self))
+    }
+    
+    public static func Instantiate() -> Self {
+        return genrericInstance()
+    }
+    
+    func hideNavigationBar(_ animated: Bool) {
+        self.navigationController?.setNavigationBarHidden(true, animated: animated)
+    }
+    
+    func showNavigationBar(_ animated: Bool) {
+        self.navigationController?.setNavigationBarHidden(false, animated: animated)
+    }
+    
     func hideKeyboardWhenTappedAround() {
         let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(UIViewController.dismissKeyboard))
         tap.cancelsTouchesInView = false

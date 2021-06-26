@@ -8,21 +8,6 @@
 
 import Foundation
 
-protocol ConvertBackdropLink {
-    var backdropPath: String? { get }
-    var backdropURL: URL? { get }
-}
-
-extension ConvertBackdropLink {
-    var backdropURL: URL? {
-        if let backdropPath = self.backdropPath?.replacingOccurrences(of: "^/", with: "", options: .regularExpression) {
-            return URL(string: backdropPath, relativeTo: URL(string: "https://image.tmdb.org/t/p/original/"))
-        }
-        return nil
-    }
-}
-
-
 struct MovieDescription: Codable, ConvertPosterLink, ConvertBackdropLink {
     let adult: Bool
     let backdropPath: String?

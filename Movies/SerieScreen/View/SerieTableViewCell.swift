@@ -12,8 +12,9 @@ import UIKit
 class SerieTableViewCell: UITableViewCell,UICollectionViewDelegateFlowLayout,UICollectionViewDataSource{
     
     private let layout = UICollectionViewFlowLayout()
-    var serieTableViewCellViewModel: SerieTableViewCellViewModel = SerieTableViewCellViewModel()
+    var serieTableViewCellViewModel: SerieTableViewCellViewModel = SerieTableViewCellViewModel(coordinator: SerieCoordinator())
     weak var delegate: SerieCollectionViewCellDelegate?
+    var serieViewController: SerieViewController?
     
     func cellConfigurate(name: String) {
         label.text = name
@@ -37,20 +38,18 @@ class SerieTableViewCell: UITableViewCell,UICollectionViewDelegateFlowLayout,UIC
         contentView.addSubview(collectionView)
     }
     
-    func setupSerieCollectionView() {
+    func setupSerieCollectionView(view: SerieViewController) {
         
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.register(SerieCollectionViewCell.self, forCellWithReuseIdentifier: "cell")
+        serieViewController = view
         
         serieTableViewCellViewModel.setupSerieTableViewCell {
             DispatchQueue.main.async {
                 self.collectionView.reloadData()
             }
         }
-        
-        
-        
     }
     
     lazy var label: UILabel = {
@@ -85,11 +84,9 @@ class SerieTableViewCell: UITableViewCell,UICollectionViewDelegateFlowLayout,UIC
     }
     
     
-        func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-               if delegate != nil {
-                delegate?.cellTapped(serie: serieTableViewCellViewModel.genreSerie[indexPath.row])
-               }
-           }
-    
-    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        if delegate != nil {
+            delegate?.cellTapped(serieTableViewCellViewModel.genreSerie[indexPath.row])
+        }
+    }
 }

@@ -10,17 +10,30 @@ import Foundation
 import AVFoundation
 import AVKit
 
+protocol MovieDescriptionViewModelDelegate: AnyObject {
+    func cellTappedRecomendation(id: Int)
+}
+
 class MovieDescriptionViewModel {
     
     var service: DescriptionEndPoint = ServiceDescriptionMovie()
     var video = [MovieVideo]()
+    var recommendation = [Movie]()
     var id: Int
     var urlMovieDescriptionLink: URL?
     var descriptionFirebase: MovieDescription?
     var isFavorite: Bool = false
+    var childCoordinator: MovieDescriptionCoordinator
+    weak var delegate: MovieDescriptionViewModelDelegate?
     
-    init(id: Int) {
+    init(id: Int, coordinator: MovieDescriptionCoordinator) {
         self.id = id
+        self.childCoordinator = coordinator
+        delegate = coordinator
+    }
+    
+    func sendMovieRecommendation(id: Int) {
+        delegate?.cellTappedRecomendation(id: id)
     }
     
     func fetchMovieDescription(sucess: @escaping( _ MovieDescription: MovieDescription) -> Void, failure: @escaping () -> Void) {
@@ -48,6 +61,19 @@ class MovieDescriptionViewModel {
                 let videoSucess = movieVideo
                 self.video = videoSucess
                 sucess(videoSucess)
+            case .failure:
+                self.handleError()
+            }
+        }
+    }
+    
+    func fetchMovieRecommendation(sucess: @escaping(_ recommendation: [Movie]) -> Void) {
+        service.fetchMovieRecommendations(id: id) { (result) in
+            switch result {
+            case .sucess(let movieRecommendation):
+                let recommendationSucess = movieRecommendation
+                self.recommendation = recommendationSucess
+                sucess(recommendationSucess)
             case .failure:
                 self.handleError()
             }

@@ -26,7 +26,6 @@ class SerieDescriptionCollectionViewCell: UICollectionViewCell {
     lazy var progressLoad: UIActivityIndicatorView = {
         var activity = UIActivityIndicatorView(style: UIActivityIndicatorView.Style.medium)
         activity.startAnimating()
-        activity.color = .black
         contentView.addSubview(activity)
         return activity
     }()
