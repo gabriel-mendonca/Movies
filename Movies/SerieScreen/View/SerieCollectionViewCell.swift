@@ -43,15 +43,10 @@ class SerieCollectionViewCell: UICollectionViewCell {
         
     }
     
-    func image(url: URL?) {
-        if let url = url {
-            posterImageView.sd_setImage(with: url) { (image, error, _, url) in
-                self.progressLoad.stopAnimating()
-                self.cornerRadiusPoster()
-            }
-        } else {
-            
-        }
+    func image(url: String?) {
+        posterImageView.renderImageView(urlImage: url ?? "")
+        self.progressLoad.stopAnimating()
+        self.cornerRadiusPoster()
     }
     
     func cornerRadiusPoster() {

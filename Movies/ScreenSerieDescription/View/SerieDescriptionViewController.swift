@@ -249,13 +249,13 @@ class SerieDescriptionViewController: UIViewController {
         synopse.text = "Sinopse: \nTemporadas: \n\(sinopse)"
         starEvaluation(nota: serieDescription.voteAverage)
         if serieDescription.backdropURL != nil {
-            backdrop.sd_setImage(with: serieDescription.backdropURL)
+            backdrop.renderImageView(urlImage: serieDescription.backdropURL ?? "")
             progressLoad.stopAnimating()
         } else {
             backdrop.image = UIImage(named: "imagem indisponivel")
             progressLoad.stopAnimating()
         }
-        poster.sd_setImage(with: serieDescription.posterURL)
+        poster.renderImageView(urlImage: serieDescription.posterURL ?? "")
     }
     
     func ageRange(parentalRating: Bool?) {

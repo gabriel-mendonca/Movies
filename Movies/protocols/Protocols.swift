@@ -10,12 +10,12 @@ import Foundation
 
 protocol ConvertBackdropLink {
     var backdropPath: String? { get }
-    var backdropURL: URL? { get }
+    var backdropURL: String? { get }
 }
 
 protocol ConvertPosterLink {
     var posterPath: String? { get }
-    var posterURL: URL? { get }
+    var posterURL: String? { get }
 }
 
 protocol MovieEndPoint {

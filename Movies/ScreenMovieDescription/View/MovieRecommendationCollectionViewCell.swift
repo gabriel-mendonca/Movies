@@ -25,10 +25,9 @@ class MovieRecommendationCollectionViewCell: UICollectionViewCell {
     }()
     
     func setImage(movieRecommendation: Movie) {
-        poster.sd_setImage(with: movieRecommendation.posterURL) { (image, error, _, _) in
-            self.progressLoad.stopAnimating()
-            self.cornerRadiusPoster()
-        }
+        poster.renderImageView(urlImage: movieRecommendation.posterURL ?? "")
+        self.progressLoad.startAnimating()
+        self.cornerRadiusPoster()
     }
     
     func setupContraints() {

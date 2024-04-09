@@ -37,8 +37,8 @@ class MovieTableViewCellViewModel {
     func numberOfMovies() -> Int {
         return listGenreMovie.count
     }
-    func get(at row: Int) -> URL? {
-        return listGenreMovie[row].posterURL ?? URL(string: "")
+    func get(at row: Int) -> String? {
+        return listGenreMovie[row].posterURL ?? ""
     }
     
     func setupTableViewCell(completion: @escaping () -> Void) {

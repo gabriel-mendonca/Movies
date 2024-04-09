@@ -409,11 +409,11 @@ class MovieDescriptionViewController: UIViewController,UIViewControllerTransitio
         synopse.text = "Sinopse: \n \(sinopse)"
         starEvaluation(nota: description.voteAverage)
         if description.backdropURL != nil {
-        backdrop.sd_setImage(with: description.backdropURL)
+            backdrop.renderImageView(urlImage: description.backdropURL ?? "")
         } else {
             backdrop.image = UIImage(named: "imagem indisponivel")
         }
-        poster.sd_setImage(with: description.posterURL)
+        poster.renderImageView(urlImage: description.posterURL ?? "")
     }
     
     private func handleReleaseDate(dateRelease: String) {

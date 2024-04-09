@@ -31,9 +31,8 @@ class SerieDescriptionCollectionViewCell: UICollectionViewCell {
     }()
     
     func imageSeasons(serieDescription: DescriptionSeason?) {
-        imagem.sd_setImage(with: serieDescription?.posterURL) { (image, erro, _, url) in
-            self.progressLoad.stopAnimating()
-        }
+        imagem.renderImageView(urlImage: serieDescription?.posterURL ?? "")
+        self.progressLoad.stopAnimating()
         title.text = serieDescription?.name
         
     }

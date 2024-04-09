@@ -9,9 +9,9 @@
 import UIKit
 
 extension ConvertPosterLink {
-    var posterURL: URL? {
+    var posterURL: String? {
         if let posterPath = self.posterPath?.replacingOccurrences(of: "^/", with: "", options: .regularExpression) {
-            return URL(string: posterPath, relativeTo: URL(string: "https://image.tmdb.org/t/p/w200/"))
+            return "https://image.tmdb.org/t/p/w200/\(posterPath)"
             
         }
         return nil
@@ -19,9 +19,9 @@ extension ConvertPosterLink {
 }
 
 extension ConvertBackdropLink {
-    var backdropURL: URL? {
+    var backdropURL: String? {
         if let backdropPath = self.backdropPath?.replacingOccurrences(of: "^/", with: "", options: .regularExpression) {
-            return URL(string: backdropPath, relativeTo: URL(string: "https://image.tmdb.org/t/p/original/"))
+            return "https://image.tmdb.org/t/p/original/\(backdropPath)"
         }
         return nil
     }

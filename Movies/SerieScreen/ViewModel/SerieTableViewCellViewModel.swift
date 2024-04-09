@@ -34,8 +34,8 @@ class SerieTableViewCellViewModel {
         return genreSerie.count
     }
     
-    func getSerie(at row: Int) -> URL? {
-        return genreSerie[row].posterURL
+    func getSerie(at row: Int) -> String? {
+        return genreSerie[row].posterURL ?? ""
     }
     
     func setupSerieTableViewCell(completion: @escaping () -> Void) {

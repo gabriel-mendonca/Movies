@@ -46,10 +46,8 @@ class SearchViewModel {
         return searchMovie.count
     }
     
-    func getSearch(at row: Int) -> URL? {
-        return searchMovie[row].posterURL ?? URL(string: "")
-        
-        
+    func getSearch(at row: Int) -> String? {
+        return searchMovie[row].posterURL ?? ""
     }
     
     

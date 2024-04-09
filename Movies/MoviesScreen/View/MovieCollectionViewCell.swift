@@ -49,13 +49,11 @@ class MovieCollectionViewCell: UICollectionViewCell {
         
     }
     
-    func image(url: URL?) {
-        if let url = url {
-            posterImageView.sd_setImage(with: url) { (image, error, _, url) in
-                self.prgressLoad.stopAnimating()
-                self.cornerRadiusPoster()
-            }
-        }
+    func image(url: String?) {
+        
+        posterImageView.renderImageView(urlImage: url ?? "")
+        self.prgressLoad.stopAnimating()
+        self.cornerRadiusPoster()
     }
     
     func cornerRadiusPoster() {
