@@ -13,52 +13,41 @@ enum resultMovieSearch {
     case failure(error: Erro )
 }
 
-class NetworkServiceSearch {
+final class NetworkServiceSearch {
     
-    func fetchMultiSearch(query: String, completion: @escaping( _ result: resultMovieSearch) -> Void) {
-        var movieSearch = [MovieSearch]()
+    func fetchMultiSearch(
+        query: String,
+        completion: @escaping (resultMovieSearch) -> Void
+    ) {
         
-        guard let url = URL(string: serviceSearch(query: query) ) else {
-            return
-        }
-        URLSession.shared.dataTask(with: url) { (data, _, error) in
+        let queryItems = [
+            URLQueryItem(name: "language", value: "pt-BR"),
+            URLQueryItem(name: "query", value: query),
+            URLQueryItem(name: "page", value: "1"),
+            URLQueryItem(name: "include_adult", value: "false")
+        ]
+        
+        guard let request = ApiClient.makeRequest(
+            path: "/search/multi",
+            queryItems: queryItems
+        ) else { return }
+        
+        URLSession.shared.dataTask(with: request) { data, _, error in
             DispatchQueue.main.async {
-                if error == nil {
-                    do{
-                        guard let data = data else {return}
-
-                        let movies = try JSONDecoder().decode(SearchMovieResult.self, from: data)
-                        print("JSONNNN = ", movies)
-                        movieSearch = movies.results
-                        completion(resultMovieSearch.sucess(movieSearch: movieSearch))
-                    } catch {
-                        if let data = data {
-                            let str = String(data: data, encoding: .utf8)
-                            print("Parse Error3",str as Any, error)
-                        } else {
-                            print("Parse Error3", error)
-                        }
-                        completion(resultMovieSearch.failure(error: Erro.parseError(error: "Erro no Parse")))
-                    }
+                if let error = error {
+                    completion(.failure(error: .parseError(error: error.localizedDescription)))
+                    return
+                }
+                
+                guard let data = data else { return }
+                
+                do {
+                    let movies = try JSONDecoder().decode(SearchMovieResult.self, from: data)
+                    completion(.sucess(movieSearch: movies.results))
+                } catch {
+                    completion(.failure(error: .parseError(error: error.localizedDescription)))
                 }
             }
         }.resume()
     }
-
-}
-
-extension NetworkServiceSearch {
-    
-    func serviceSearch(query: String) -> String {
-    
-        let service = "https://api.themoviedb.org/3/search/multi?api_key=68206fe24af296b2560c51089250d615&language=pt-BR&query=\(query)&page=1&include_adult=false"
-        
-        return service
-        
-    }
-    
-//    https://api.themoviedb.org/3/search/movie?api_key=68206fe24af296b2560c51089250d615&language=pt-BR&query=\(query)&page=1&include_adult=false
-    
-    //"https://api.themoviedb.org/3/search/multi?api_key=68206fe24af296b2560c51089250d615&language=pt-BR&query=\(query)&page=1&include_adult=false"
-    
 }

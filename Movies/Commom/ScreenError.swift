@@ -10,12 +10,6 @@ import UIKit
 
 class ScreenError: UIView {
     
-//    override func viewDidLoad() {
-//        super.viewDidLoad()
-//        setupContraints()
-//        view.backgroundColor = .white
-//    }
-    
     var viewController: UIViewController?
     var text: String?
     var image: UIImage?

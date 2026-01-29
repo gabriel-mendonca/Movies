@@ -29,6 +29,7 @@ struct MovieSearch: Codable,ConvertPosterLink {
         case posterPath = "poster_path"
         case id
     }
+    
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: MovieKey.self)
         let mediaType = try container.decodeIfPresent(String.self, forKey: .mediaType)

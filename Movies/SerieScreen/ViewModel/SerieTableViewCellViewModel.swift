@@ -12,8 +12,7 @@ protocol SerieCollectionViewCellDelegate: AnyObject {
     func cellTapped(_ model: Serie)
 }
 
-
-class SerieTableViewCellViewModel {
+final class SerieTableViewCellViewModel {
     
     var service = NetworkServiceSeries()
     var id = 0
@@ -52,7 +51,7 @@ class SerieTableViewCellViewModel {
     }
     
     func setupSeriePopular(completion: @escaping () -> Void) {
-        service.fetchSeriePoupular { (result) in
+        service.fetchSeriePopular { (result) in
             switch result {
             case .sucess(let listGenre):
                 self.genreSerie = listGenre

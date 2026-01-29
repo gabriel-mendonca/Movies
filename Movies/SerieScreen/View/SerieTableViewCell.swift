@@ -9,74 +9,90 @@
 import Foundation
 import UIKit
 
-class SerieTableViewCell: UITableViewCell,UICollectionViewDelegateFlowLayout,UICollectionViewDataSource{
+final class SerieTableViewCell: UITableViewCell {
     
     private let layout = UICollectionViewFlowLayout()
-    var serieTableViewCellViewModel: SerieTableViewCellViewModel = SerieTableViewCellViewModel(coordinator: SerieCoordinator())
+    private var serieTableViewCellViewModel: SerieTableViewCellViewModel!
     weak var delegate: SerieCollectionViewCellDelegate?
-    var serieViewController: SerieViewController?
     
-    func cellConfigurate(name: String) {
-        label.text = name
-        
-        label.translatesAutoresizingMaskIntoConstraints = false
-        let top = label.topAnchor.constraint(equalTo: contentView.topAnchor,constant: 10)
-        let leading = label.leadingAnchor.constraint(equalTo: contentView.leadingAnchor)
-        NSLayoutConstraint.activate([top,leading])
-        contentView.addSubview(label)
-        
-    }
-    
-    func setupSerieCollectionViewContraints() {
-        
-        collectionView.translatesAutoresizingMaskIntoConstraints = false
-        let top = collectionView.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 10)
-        let leading = collectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor)
-        let trailing = collectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor)
-        let bottom = collectionView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
-        NSLayoutConstraint.activate([top,leading,trailing,bottom])
-        contentView.addSubview(collectionView)
-    }
-    
-    func setupSerieCollectionView(view: SerieViewController) {
-        
-        collectionView.delegate = self
-        collectionView.dataSource = self
-        collectionView.register(SerieCollectionViewCell.self, forCellWithReuseIdentifier: "cell")
-        serieViewController = view
-        
-        serieTableViewCellViewModel.setupSerieTableViewCell {
-            DispatchQueue.main.async {
-                self.collectionView.reloadData()
-            }
-        }
-    }
-    
-    lazy var label: UILabel = {
+    lazy var titleLabel: UILabel = {
         var textLabel = UILabel()
         textLabel.textColor = .white
-        addSubview(textLabel)
         return textLabel
     }()
     
     lazy var collectionView: UICollectionView = {
         var collection = UICollectionView(frame: .zero, collectionViewLayout: layout)
         layout.scrollDirection = .horizontal
-        addSubview(collection)
+        collection.backgroundColor = .black
         return collection
     }()
     
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return serieTableViewCellViewModel.numberOfSerie()
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        backgroundColor = .black
     }
     
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! SerieCollectionViewCell
-        cell.image(url: serieTableViewCellViewModel.getSerie(at: indexPath.row))
-        cell.setupSerieImageViewContraints()
-        return cell
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        contentView.subviews.forEach({ $0.removeFromSuperview() })
+    }
+    
+    private func cellConfigurate(name: String) {
+        titleLabel.text = name
+        
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        let top = titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor,constant: 10)
+        let leading = titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor)
+        NSLayoutConstraint.activate([top,leading])
+        
+    }
+    
+    func setupView(serieTableViewCellViewModel: SerieTableViewCellViewModel, nameTitle: String, delegate: SerieCollectionViewCellDelegate?) {
+        self.serieTableViewCellViewModel = serieTableViewCellViewModel
+        self.delegate = delegate
+        setupHierarchy()
+        setupSerieCollectionView()
+        cellConfigurate(name: nameTitle)
+    }
+    
+    private func setupHierarchy() {
+        contentView.addSubview(titleLabel)
+        contentView.addSubview(collectionView)
+        
+        setupSerieCollectionViewContraints()
+    }
+    
+    private func setupSerieCollectionViewContraints() {
+        
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        let top = collectionView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 10)
+        let leading = collectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor)
+        let trailing = collectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor)
+        let bottom = collectionView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
+        NSLayoutConstraint.activate([top,leading,trailing,bottom])
+        
+    }
+    
+    private func setupSerieCollectionView() {
+        
+        collectionView.delegate = self
+        collectionView.dataSource = self
+        collectionView.register(SerieCollectionViewCell.self, forCellWithReuseIdentifier: "cell")
+        
+        serieTableViewCellViewModel.setupSerieTableViewCell { [weak self] in
+            DispatchQueue.main.async {
+                self?.collectionView.reloadData()
+            }
+        }
+    }
+}
+
+extension SerieTableViewCell: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let height = 187
         let width = 126
@@ -85,8 +101,18 @@ class SerieTableViewCell: UITableViewCell,UICollectionViewDelegateFlowLayout,UIC
     
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if delegate != nil {
-            delegate?.cellTapped(serieTableViewCellViewModel.genreSerie[indexPath.row])
-        }
+        delegate?.cellTapped(serieTableViewCellViewModel.genreSerie[indexPath.row])
+    }
+}
+
+extension SerieTableViewCell: UICollectionViewDataSource {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return serieTableViewCellViewModel.numberOfSerie()
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! SerieCollectionViewCell
+        cell.setupView(url: serieTableViewCellViewModel.getSerie(at: indexPath.row))
+        return cell
     }
 }

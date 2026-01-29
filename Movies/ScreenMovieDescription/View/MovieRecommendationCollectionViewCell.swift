@@ -8,11 +8,11 @@
 
 import UIKit
 
-class MovieRecommendationCollectionViewCell: UICollectionViewCell {    
+final class MovieRecommendationCollectionViewCell: UICollectionViewCell {
     
     lazy var poster: UIImageView = {
        var image = UIImageView()
-        addSubview(image)
+        
         return image
     }()
     
@@ -20,17 +20,34 @@ class MovieRecommendationCollectionViewCell: UICollectionViewCell {
         var progress = UIActivityIndicatorView(style: UIActivityIndicatorView.Style.medium)
         progress.startAnimating()
         progress.color = .black
-        contentView.addSubview(progress)
         return progress
     }()
     
-    func setImage(movieRecommendation: Movie) {
-        poster.renderImageView(urlImage: movieRecommendation.posterURL ?? "")
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        contentView.subviews.forEach({ $0.removeFromSuperview() })
+    }
+    
+    func setupView(url: String) {
+        setupHierarchy()
+        setImage(url: url)
+        cornerRadiusPoster()
+    }
+    
+    private func setupHierarchy() {
+        contentView.addSubview(poster)
+        contentView.addSubview(progressLoad)
+        
+        setupContraints()
+    }
+    
+    private func setImage(url: String) {
+        poster.renderImageView(urlImage: url)
         self.progressLoad.startAnimating()
         self.cornerRadiusPoster()
     }
     
-    func setupContraints() {
+    private func setupContraints() {
         progressLoad.translatesAutoresizingMaskIntoConstraints = false
         let centerX = progressLoad.centerXAnchor.constraint(equalTo: contentView.centerXAnchor)
         let centerY = progressLoad.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
@@ -46,9 +63,8 @@ class MovieRecommendationCollectionViewCell: UICollectionViewCell {
         contentView.addSubview(poster)
     }
     
-    func cornerRadiusPoster() {
-        poster.clipsToBounds = true
-        poster.layer.cornerRadius = poster.frame.size.width / 12.5
+    private func cornerRadiusPoster() {
+        contentView.clipsToBounds = true
+        contentView.layer.cornerRadius = contentView.frame.size.width / AppConstants.UI.posterCornerRadiusDivisor
     }
-    
 }

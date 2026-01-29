@@ -8,7 +8,6 @@
 
 import Foundation
 
-
 class MovieDescriptionCoordinator: Coordinator {
     var view: MovieDescriptionViewController?
     var navigation: NavigationController?
@@ -30,14 +29,10 @@ class MovieDescriptionCoordinator: Coordinator {
         descriptionMovie.start(usingPresentation: .push(navigation: navigation))
         
     }
-    
-    
 }
 
 extension MovieDescriptionCoordinator: MovieDescriptionViewModelDelegate {
     func cellTappedRecomendation(id: Int) {
         sendMovieRecomendation(id: id)
     }
-    
-    
 }

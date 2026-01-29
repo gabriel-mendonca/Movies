@@ -8,33 +8,50 @@
 
 import Foundation
 
-class MovieViewModel {
+/// Protocolo para melhorar testabilidade e seguir Dependency Inversion Principle
+protocol MovieViewModelProtocol {
+    var genreMovie: [Genre] { get }
+    func numberOfMoviesGenre() -> Int
+    func getMovie(at row: Int) -> (String, Int)
+    func loadGenres(completion: @escaping () -> Void)
+}
+
+class MovieViewModel: MovieViewModelProtocol {
     
-    var genreMovie = [Genre]()
-    var service: MovieEndPoint = TheMovieDb()
+    // MARK: - Properties
+    private(set) var genreMovie: [Genre] = []
+    private let service: MovieEndPoint
     
-    func numberOfMoviesGenre() -> Int{
+    // MARK: - Initialization
+    init(service: MovieEndPoint = TheMovieDb()) {
+        self.service = service
+    }
+    
+    // MARK: - Public Methods
+    func numberOfMoviesGenre() -> Int {
         return genreMovie.count
     }
 
     func getMovie(at row: Int) -> (String, Int) {
+        guard row >= 0 && row < genreMovie.count else {
+            return ("", 0)
+        }
         return (genreMovie[row].name, genreMovie[row].id)
     }
     
-    func setUpViewController(completion : @escaping () -> Void) {
-        service.fetchNameGenre { result in
+    func loadGenres(completion: @escaping () -> Void) {
+        service.fetchNameGenre { [weak self] result in
             switch result {
-            case.sucess(let listGenre):
-                self.genreMovie = listGenre
+            case .sucess(let listGenre):
+                self?.genreMovie = listGenre
                 completion()
-            case .failure:
-                self.handleError()
+            case .failure(let error):
+                self?.handleError()
             }
         }
-        
     }
     
-    func handleError() {}
-    
-    
+    private func handleError() {
+        // Implementar tratamento de erro adequado
+    }
 }

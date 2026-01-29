@@ -18,7 +18,7 @@ class SerieCoordinator: Coordinator {
         serieViewModel = SerieTableViewCellViewModel(coordinator: self)
         view = SerieViewController(viewModel: serieViewModel)
         view?.serieTableViewCellViewModel = serieViewModel
-        view?.serieTableViewCellViewModel?.delegate = self
+        view?.serieTableViewCellViewModel.delegate = self
     }
     
     func showSeries(_ model: Serie) {

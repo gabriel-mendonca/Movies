@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 54;
+	objectVersion = 50;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -70,6 +70,11 @@
 		DAB1FB5624BCFCE1006CC737 /* SerieTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB1FB5524BCFCE1006CC737 /* SerieTableViewCell.swift */; };
 		DAB1FB5824BD0041006CC737 /* SerieTableViewCellViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB1FB5724BD0041006CC737 /* SerieTableViewCellViewModel.swift */; };
 		DAB1FB5A24BD0350006CC737 /* SerieCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB1FB5924BD0350006CC737 /* SerieCollectionViewCell.swift */; };
+		DAC024422F2AB9970011B1D0 /* ConstraintBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAC024402F2AB9970011B1D0 /* ConstraintBuilder.swift */; };
+		DAC024442F2AB9CE0011B1D0 /* ViewConfigurable.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAC024432F2AB9CE0011B1D0 /* ViewConfigurable.swift */; };
+		DAC024472F2ABA3E0011B1D0 /* AppConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAC024452F2ABA3E0011B1D0 /* AppConstants.swift */; };
+		DAC024492F2ABA6B0011B1D0 /* CoordinatorProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAC024482F2ABA6B0011B1D0 /* CoordinatorProtocol.swift */; };
+		DAC0244B2F2B93A30011B1D0 /* MakeRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAC0244A2F2B939E0011B1D0 /* MakeRequest.swift */; };
 		DACC531E24D5C777009C4B79 /* SerieDescriptionCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DACC531D24D5C777009C4B79 /* SerieDescriptionCollectionViewCell.swift */; };
 		E6E07DF77B012845E1C3F198 /* Pods_Movies_MoviesUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F319B1890A35D8A6CF6FBD72 /* Pods_Movies_MoviesUITests.framework */; };
 /* End PBXBuildFile section */
@@ -164,6 +169,11 @@
 		DAB1FB5524BCFCE1006CC737 /* SerieTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SerieTableViewCell.swift; sourceTree = "<group>"; };
 		DAB1FB5724BD0041006CC737 /* SerieTableViewCellViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SerieTableViewCellViewModel.swift; sourceTree = "<group>"; };
 		DAB1FB5924BD0350006CC737 /* SerieCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SerieCollectionViewCell.swift; sourceTree = "<group>"; };
+		DAC024402F2AB9970011B1D0 /* ConstraintBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstraintBuilder.swift; sourceTree = "<group>"; };
+		DAC024432F2AB9CE0011B1D0 /* ViewConfigurable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewConfigurable.swift; sourceTree = "<group>"; };
+		DAC024452F2ABA3E0011B1D0 /* AppConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConstants.swift; sourceTree = "<group>"; };
+		DAC024482F2ABA6B0011B1D0 /* CoordinatorProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoordinatorProtocol.swift; sourceTree = "<group>"; };
+		DAC0244A2F2B939E0011B1D0 /* MakeRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MakeRequest.swift; sourceTree = "<group>"; };
 		DACC531D24D5C777009C4B79 /* SerieDescriptionCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SerieDescriptionCollectionViewCell.swift; sourceTree = "<group>"; };
 		DC674703F2F50BA9767D08B2 /* Pods-Movies.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Movies.debug.xcconfig"; path = "Target Support Files/Pods-Movies/Pods-Movies.debug.xcconfig"; sourceTree = "<group>"; };
 		F319B1890A35D8A6CF6FBD72 /* Pods_Movies_MoviesUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Movies_MoviesUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -225,6 +235,8 @@
 		C036C8AF25C36A43004A3C11 /* protocols */ = {
 			isa = PBXGroup;
 			children = (
+				DAC024482F2ABA6B0011B1D0 /* CoordinatorProtocol.swift */,
+				DAC024432F2AB9CE0011B1D0 /* ViewConfigurable.swift */,
 				C036C8B025C36A56004A3C11 /* Protocols.swift */,
 			);
 			path = protocols;
@@ -233,6 +245,9 @@
 		C03F0AA025BBC8210015A7F7 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
+				DAC0244C2F2B95B30011B1D0 /* Service */,
+				DAC024462F2ABA3E0011B1D0 /* Constants */,
+				DAC024412F2AB9970011B1D0 /* Constraints */,
 				C061672825C83D2A0024898B /* Coordinator */,
 				C061671425C83A590024898B /* Extensions */,
 				C036C8C325C476C4004A3C11 /* Reachability.swift */,
@@ -642,6 +657,30 @@
 			path = Service;
 			sourceTree = "<group>";
 		};
+		DAC024412F2AB9970011B1D0 /* Constraints */ = {
+			isa = PBXGroup;
+			children = (
+				DAC024402F2AB9970011B1D0 /* ConstraintBuilder.swift */,
+			);
+			path = Constraints;
+			sourceTree = "<group>";
+		};
+		DAC024462F2ABA3E0011B1D0 /* Constants */ = {
+			isa = PBXGroup;
+			children = (
+				DAC024452F2ABA3E0011B1D0 /* AppConstants.swift */,
+			);
+			path = Constants;
+			sourceTree = "<group>";
+		};
+		DAC0244C2F2B95B30011B1D0 /* Service */ = {
+			isa = PBXGroup;
+			children = (
+				DAC0244A2F2B939E0011B1D0 /* MakeRequest.swift */,
+			);
+			path = Service;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -844,6 +883,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DAC024422F2AB9970011B1D0 /* ConstraintBuilder.swift in Sources */,
 				C06167D325C889DF0024898B /* MovieCoordinator.swift in Sources */,
 				DAB1FB4C24BCF775006CC737 /* SerieViewController.swift in Sources */,
 				DA8877F524B7D88100C59B19 /* MovieTableViewCell.swift in Sources */,
@@ -855,6 +895,7 @@
 				DAB1FB5624BCFCE1006CC737 /* SerieTableViewCell.swift in Sources */,
 				C0D138CD2BC4CED1008B319D /* ImageCache.swift in Sources */,
 				DA61DA3224C2385D0031D7AF /* DescriptionSeason.swift in Sources */,
+				DAC0244B2F2B93A30011B1D0 /* MakeRequest.swift in Sources */,
 				DA8877F324B7A63C00C59B19 /* MovieTableViewCelViewModel.swift in Sources */,
 				C061670D25C7AAC50024898B /* MovieRecommendationCollectionViewCell.swift in Sources */,
 				C070067F2687AD6900F5D7E6 /* MovieDescriptionCoordinator.swift in Sources */,
@@ -876,6 +917,8 @@
 				DACC531E24D5C777009C4B79 /* SerieDescriptionCollectionViewCell.swift in Sources */,
 				DAB1FB5424BCF7E6006CC737 /* GenreSerie.swift in Sources */,
 				DA61DA3024C2382C0031D7AF /* ServiceSerieDescription.swift in Sources */,
+				DAC024442F2AB9CE0011B1D0 /* ViewConfigurable.swift in Sources */,
+				DAC024492F2ABA6B0011B1D0 /* CoordinatorProtocol.swift in Sources */,
 				C061671625C83A6F0024898B /* ConvertLink.swift in Sources */,
 				DA61DA1024BE8BAB0031D7AF /* Search.swift in Sources */,
 				C061680F25C9D80D0024898B /* SerieCoordinator.swift in Sources */,
@@ -890,6 +933,7 @@
 				C061672A25C83D3A0024898B /* BaseCoordinator.swift in Sources */,
 				C03F0B1A25BDD68F0015A7F7 /* YoutubeViewController.swift in Sources */,
 				DA61DA0D24BE8B470031D7AF /* SearchViewController.swift in Sources */,
+				DAC024472F2ABA3E0011B1D0 /* AppConstants.swift in Sources */,
 				DA75F8C624BC9E51000683C6 /* TabBarController.swift in Sources */,
 				DA61DA2A24C237FD0031D7AF /* SerieDescriptionViewController.swift in Sources */,
 				C033A94425CDB6830075E8ED /* UINavigationController.swift in Sources */,
@@ -1070,7 +1114,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = PTX4N4MXM3;
 				INFOPLIST_FILE = Movies/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1090,7 +1134,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = PTX4N4MXM3;
 				INFOPLIST_FILE = Movies/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

@@ -49,8 +49,8 @@ class MovieDescriptionViewModel {
                 }
             case .failure:
                 self.handleError()
+                failure()
             }
-            failure()
         }
     }
     
@@ -93,8 +93,6 @@ class MovieDescriptionViewModel {
         formatter.dateStyle = .short
         formatter.locale = Locale(identifier: "pt_BR")
         return formatter.string(from: newDate)
-        
-        
     }
     
     func setupHomePage(homePage: String) {

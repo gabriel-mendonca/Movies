@@ -9,97 +9,100 @@
 import Foundation
 import UIKit
 
-class SearchViewController: UIViewController,UISearchBarDelegate,UICollectionViewDelegateFlowLayout,UICollectionViewDataSource{
+class SearchViewController: UIViewController {
     
+    // MARK: - Constants
+    private enum Constants {
+        static let cellIdentifier = "SearchCollectionViewCell"
+        static let searchBarPlaceholder = "Digite o nome do filme"
+        static let collectionViewInsets: CGFloat = 15
+        static let cellHeight: CGFloat = 170
+        static let topMargin: CGFloat = 10
+    }
     
+    // MARK: - Properties
     private let layout = UICollectionViewFlowLayout()
     var searchViewModel: SearchViewModel!
     var movieTableViewCellViewModel: MovieTableViewCellViewModel = MovieTableViewCellViewModel(coordinator: MovieCoordinator())
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        addToolbar(searchTextField: searchBar)
-        hideKeyboardWhenTappedAround()
-        setupContraints()
-        setupCollectionView()
-        searchBar.delegate = self
-        
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        hideNavigationBar(animated)
-        super.viewWillAppear(animated)
-    }
-    
+    // MARK: - Initialization
     init(viewModel: SearchViewModel) {
         self.searchViewModel = viewModel
         super.init(nibName: nil, bundle: nil)
+        view.backgroundColor = .black
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: - UI Components
     lazy var searchBar: UISearchBar = {
-        var search = UISearchBar()
+        let search = UISearchBar()
         search.searchBarStyle = .minimal
-        search.placeholder = "Digite o nome do filme"
+        search.placeholder = Constants.searchBarPlaceholder
         search.sizeToFit()
         search.tintColor = .white
-        view.addSubview(search)
+        search.backgroundColor = .black
         return search
     }()
     
     lazy var collectionViewSearch: UICollectionView = {
-        var collection = UICollectionView(frame: .zero, collectionViewLayout: layout)
         layout.scrollDirection = .vertical
-        view.addSubview(collection)
+        let collection = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collection.backgroundColor = .black
         return collection
     }()
     
-    func setupContraints() {
-        
-        collectionViewSearch.translatesAutoresizingMaskIntoConstraints = false
-        let leading = collectionViewSearch.leadingAnchor.constraint(equalTo: view.leadingAnchor,constant: 15)
-        let trailing = collectionViewSearch.trailingAnchor.constraint(equalTo: view.trailingAnchor,constant: -15)
-        let bottom = collectionViewSearch.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-        NSLayoutConstraint.activate([leading,trailing,bottom])
-        view.addSubview(collectionViewSearch)
-        
-        searchBar.translatesAutoresizingMaskIntoConstraints = false
-        let topSearch = searchBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor,constant: 10)
-        let leadingSearch = searchBar.leadingAnchor.constraint(equalTo: view.leadingAnchor)
-        let trailingSearch = searchBar.trailingAnchor.constraint(equalTo: view.trailingAnchor)
-        let bottomSearch = searchBar.bottomAnchor.constraint(equalTo: collectionViewSearch.topAnchor)
-        NSLayoutConstraint.activate([topSearch,leadingSearch,trailingSearch,bottomSearch])
-        view.addSubview(searchBar)
+    // MARK: - Lifecycle
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setupViews()
+        setupConstraints()
     }
     
-    func setupCollectionView() {
-        
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        hideNavigationBar(animated)
+    }
+    
+    // MARK: - Setup Methods
+    private func setupCollectionView() {
         collectionViewSearch.delegate = self
         collectionViewSearch.dataSource = self
-        collectionViewSearch.register(SearchCollectionViewCell.self, forCellWithReuseIdentifier: "cell")
-        
+        collectionViewSearch.register(
+            SearchCollectionViewCell.self,
+            forCellWithReuseIdentifier: Constants.cellIdentifier
+        )
+    }
+}
+
+extension SearchViewController: UICollectionViewDelegateFlowLayout {
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let cellWidth = (view.frame.width / 3) - 20
+        return CGSize(width: cellWidth, height: Constants.cellHeight)
     }
     
-    func reloadCollection() -> Bool {
-            collectionViewSearch.reloadData()
-        
-        return true
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+        return .zero
     }
     
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        searchViewModel.goToMovieDescriptionOrSerieDescription(indexPath: indexPath.row)
+    }
+}
+
+extension SearchViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         searchViewModel.searchQuery = searchBar.text ?? ""
     }
     
-    func searchBarShouldEndEditing(_ searchBar: UISearchBar) -> Bool {
-        reloadCollection()
-    }
-    
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         searchBar.searchTextField.textColor = .white
+        handleSearchTextChange(searchText)
+    }
+    
+    private func handleSearchTextChange(_ searchText: String) {
         if searchText.isEmpty {
             searchViewModel.searchQuery = searchText
             searchViewModel.searchMovie.removeAll()
@@ -109,41 +112,66 @@ class SearchViewController: UIViewController,UISearchBarDelegate,UICollectionVie
             self.collectionViewSearch.reloadData()
         }
     }
-    
+}
+
+extension SearchViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return searchViewModel.numberOfSearch()
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! SearchCollectionViewCell
-        cell.cornerRadiusPoster()
-        cell.image(url: searchViewModel.getSearch(at: indexPath.row))
-        cell.setupImageViewConstraints()
+        guard let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: Constants.cellIdentifier,
+            for: indexPath
+        ) as? SearchCollectionViewCell else {
+            return UICollectionViewCell()
+        }
+        
+        configureCell(cell, at: indexPath)
         return cell
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: (view.frame.width / 3)-20, height: 170)
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        return UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
-    }
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        
-        searchViewModel.goToMovieDescriptionOrSerieDescription(indexPath: indexPath.row)
-        
-//        if searchViewModel.searchMovie[indexPath.row].mediaType == "movie" {
-//            let movieDescriptionViewModel = MovieDescriptionViewModel(id: self.searchViewModel.searchMovie[indexPath.row].id ?? 0, coordinator: MovieDescriptionCoordinator(id: 0))
-//                let movieDescriptionViewController = MovieDescriptionViewController(movieDescriptionViewModel: movieDescriptionViewModel)
-//            self.navigationController?.pushViewController(movieDescriptionViewController, animated: true)
-//
-//        } else if searchViewModel.searchMovie[indexPath.row].mediaType == "tv" {
-//            let serieDescriptionViewModel = SerieDescriptionViewModel(id: self.searchViewModel.searchMovie[indexPath.row].id ?? 0 )
-//            let serieDescriptionViewController = SerieDescriptionViewController(serieDescriptionViewModel: serieDescriptionViewModel)
-////            self.present(serieDescriptionViewController, animated: true, completion: nil)
-//            self.navigationController?.pushViewController(serieDescriptionViewController, animated: true)
-//        }
+    private func configureCell(_ cell: SearchCollectionViewCell, at indexPath: IndexPath) {
+        cell.setupView(url: searchViewModel.getSearch(at: indexPath.row))
     }
 }
 
+extension SearchViewController: ViewConfigurable {
+    
+    func setupHierarchy() {
+        view.addSubview(searchBar)
+        view.addSubview(collectionViewSearch)
+    }
+    
+    func setupConstraints() {
+        setupCollectionViewConstraints()
+        setupSearchBarConstraints()
+    }
+    
+    private func setupViews() {
+        setupHierarchy()
+        addToolbar(searchTextField: searchBar)
+        hideKeyboardWhenTappedAround()
+        setupCollectionView()
+        searchBar.delegate = self
+    }
+    
+    private func setupCollectionViewConstraints() {
+        collectionViewSearch.makeConstraints { builder in
+            builder
+                .leading(to: view.leadingAnchor, constant: Constants.collectionViewInsets)
+                .trailing(to: view.trailingAnchor, constant: -Constants.collectionViewInsets)
+                .bottom(to: view.bottomAnchor)
+        }
+    }
+    
+    private func setupSearchBarConstraints() {
+        searchBar.makeConstraints { builder in
+            builder
+                .top(to: view.safeAreaLayoutGuide.topAnchor, constant: Constants.topMargin)
+                .leading(to: view.leadingAnchor)
+                .trailing(to: view.trailingAnchor)
+                .bottom(to: collectionViewSearch.topAnchor)
+        }
+    }
+}

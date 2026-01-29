@@ -8,35 +8,17 @@
 
 import UIKit
 
-class MovieViewController: UIViewController,UIScrollViewDelegate,MovieCollectionViewCellDelegate {
-    func cellTappedRecommendation(_ movie: Movie) {
-    }
+final class MovieViewController: UIViewController {
     
-    
-    var movieViewModel: MovieViewModel = MovieViewModel()
+    // MARK: - Properties
+    private var movieViewModel: MovieViewModel
     var movieTableViewCellViewModel: MovieTableViewCellViewModel!
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        setNeedsStatusBarAppearanceUpdate()
-        setupContraints()
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        tableView.reloadData()
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        hideNavigationBar(animated)
-        movieViewModel.setUpViewController {
-            self.tableView.reloadData()
-        }
-    }
-    
-    init(viewModel: MovieTableViewCellViewModel) {
+    // MARK: - Initialization
+    init(viewModel: MovieTableViewCellViewModel,
+         movieViewModel: MovieViewModel = MovieViewModel()) {
         self.movieTableViewCellViewModel = viewModel
+        self.movieViewModel = movieViewModel
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -44,8 +26,30 @@ class MovieViewController: UIViewController,UIScrollViewDelegate,MovieCollection
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: - Lifecycle
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setNeedsStatusBarAppearanceUpdate()
+        setupConstraints()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        hideNavigationBar(animated)
+        loadMovies()
+    }
+    
+    // MARK: - Private Methods
+    private func loadMovies() {
+        movieViewModel.loadGenres(completion: { [weak self] in
+            self?.tableView.reloadData()
+        })
+    }
+    
+    // MARK: - UI Components
     lazy var tableView: UITableView = {
-       var table = UITableView()
+        let table = UITableView()
         table.bounces = false
         table.allowsSelection = false
         table.backgroundColor = .black
@@ -53,58 +57,76 @@ class MovieViewController: UIViewController,UIScrollViewDelegate,MovieCollection
         return table
     }()
     
-    func cellTapped(movie: Movie) {
-        movieTableViewCellViewModel.showMovieDescription(movie)
-    }
-    
-    func setupContraints() {
-        
-        tableView.translatesAutoresizingMaskIntoConstraints = false
-        let top = tableView.topAnchor.constraint(equalTo: view.bottomAnchor,constant: 5)
-        let bottom = tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-        let trailing = tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
-        let leading = tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor)
-        let heightTable = tableView.heightAnchor.constraint(equalToConstant: view.frame.height) //3900.0
-        NSLayoutConstraint.activate([top,bottom,trailing,heightTable,leading])
-        view.addSubview(tableView)
-        
-        setupTableView()
-    }
-    
-    func setupTableView() {
-        
+    // MARK: - Setup Methods
+    private func setupTableView() {
         tableView.delegate = self
         tableView.dataSource = self
-        tableView.register(MovieTableViewCell.self, forCellReuseIdentifier: "cell")
-        
-        let view = MoviePopularHeaderView()
-        view.delegate = self
-        view.frame = CGRect(x: 0, y: 0, width: tableView.frame.width, height: 320)
-        tableView.tableHeaderView = view
-        
+        tableView.register(MovieTableViewCell.self, forCellReuseIdentifier: MovieTableViewCell.reuseIdentifier)
+        setupTableHeaderView()
+    }
+    
+    private func setupTableHeaderView() {
+        let headerView = MoviePopularHeaderView()
+        headerView.delegate = self
+        headerView.frame = CGRect(x: 0, y: 0, width: tableView.frame.width, height: 320)
+        tableView.tableHeaderView = headerView
     }
 }
-extension MovieViewController: UITableViewDelegate,UITableViewDataSource {
-
+// MARK: - UITableViewDataSource
+extension MovieViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return movieViewModel.numberOfMoviesGenre()
-     }
-     
-     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        
-            let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! MovieTableViewCell
-            cell.cellConfigurate(name: movieViewModel.getMovie(at: indexPath.row).0)
-            cell.movieTableViewCellViewModel.id = movieViewModel.getMovie(at: indexPath.row).1
-            cell.setupCollectionView()
-            cell.delegate = self
-            cell.reloadData()
-            cell.Mylabel.textColor = .white
-            cell.backgroundColor = .black
-            return cell
-     }
+    }
     
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        guard let cell = tableView.dequeueReusableCell(
+            withIdentifier: MovieTableViewCell.reuseIdentifier,
+            for: indexPath
+        ) as? MovieTableViewCell else {
+            return UITableViewCell()
+        }
+        
+        let (genreName, genreId) = movieViewModel.getMovie(at: indexPath.row)
+        configureCell(cell, genreName: genreName, genreId: genreId)
+        return cell
+    }
+    
+    private func configureCell(_ cell: MovieTableViewCell, genreName: String, genreId: Int) {
+        cell.cellConfigurate(name: genreName)
+        cell.movieTableViewCellViewModel.id = genreId
+        cell.setupCollectionView()
+        cell.delegate = self
+    }
+}
+
+// MARK: - UITableViewDelegate
+extension MovieViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 250
     }
-  
+}
+
+extension MovieViewController: MovieCollectionViewCellDelegate {
+    func cellTappedRecommendation(_ movie: Movie) {
+        // Implementação vazia - delegado para MovieCoordinator
+    }
+    
+    func cellTapped(movie: Movie) {
+        movieTableViewCellViewModel.showMovieDescription(movie)
+    }
+}
+
+extension MovieViewController: ViewConfigurable {
+    func setupConstraints() {
+        tableView.makeConstraints { builder in
+            builder
+                .top(to: view.topAnchor, constant: 5)
+                .leading(to: view.leadingAnchor)
+                .trailing(to: view.trailingAnchor)
+                .bottom(to: view.bottomAnchor)
+                .height(view.frame.height)
+        }
+        
+        setupTableView()
+    }
 }

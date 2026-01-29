@@ -9,85 +9,127 @@
 import Foundation
 import UIKit
 
-class MovieTableViewCell: UITableViewCell,UICollectionViewDataSource,UICollectionViewDelegateFlowLayout {
+class MovieTableViewCell: UITableViewCell {
     
+    // MARK: - Constants
+    static let reuseIdentifier = "MovieTableViewCell"
+    
+    // MARK: - Properties
     var movieTableViewCellViewModel: MovieTableViewCellViewModel = MovieTableViewCellViewModel(coordinator: MovieCoordinator())
     weak var delegate: MovieCollectionViewCellDelegate?
-    let layout = UICollectionViewFlowLayout()
+    private let layout = UICollectionViewFlowLayout()
     
-    func cellConfigurate(name: String) {
-        Mylabel.text = name
-        
-        Mylabel.translatesAutoresizingMaskIntoConstraints = false
-        let top = Mylabel.topAnchor.constraint(equalTo: contentView.topAnchor)
-        let leading = Mylabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor,constant: 10)
-        NSLayoutConstraint.activate([top,leading])
-        contentView.addSubview(Mylabel)
+    // MARK: - Initialization
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        backgroundColor = .black
     }
     
-    func setupCollectionView() {
-        collectionView.translatesAutoresizingMaskIntoConstraints = false
-        let top = collectionView.topAnchor.constraint(equalTo: Mylabel.bottomAnchor,constant: 10)
-        let leading = collectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor)
-        let trailing = collectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor)
-        let bottom = collectionView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
-        NSLayoutConstraint.activate([top,leading,trailing,bottom])
-        contentView.addSubview(collectionView)
-        
-        self.collectionView.delegate = self
-        self.collectionView.dataSource = self
-        self.collectionView.register(MovieCollectionViewCell.self, forCellWithReuseIdentifier: "cell")
-        
-        movieTableViewCellViewModel.setupTableViewCell {
-            DispatchQueue.main.async {
-                self.collectionView.reloadData()
-            }
-        }
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        contentView.subviews.forEach({ $0.removeFromSuperview() })
+    }
+    
+    // MARK: - UI Components
     lazy var Mylabel: UILabel = {
-       var label = UILabel()
-        contentView.addSubview(label)
+        let label = UILabel()
+        label.textColor = .white
         return label
     }()
     
     lazy var collectionView: UICollectionView = {
-        var collection = UICollectionView(frame: .zero, collectionViewLayout: layout )
         layout.scrollDirection = .horizontal
         layout.sectionInset = UIEdgeInsets(top: 10, left: 5, bottom: 5, right: 0)
-        contentView.addSubview(collection)
+        let collection = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collection.backgroundColor = .black
         return collection
     }()
     
+    // MARK: - Configuration
+    func cellConfigurate(name: String) {
+        Mylabel.text = name
+    }
+    
+    func setupCollectionView() {
+        setup()
+        configureCollectionView()
+        loadMovies()
+    }
+    
+    private func configureCollectionView() {
+        collectionView.delegate = self
+        collectionView.dataSource = self
+        collectionView.register(
+            MovieCollectionViewCell.self,
+            forCellWithReuseIdentifier: MovieCollectionViewCell.reuseIdentifier
+        )
+    }
+    
+    private func loadMovies() {
+        movieTableViewCellViewModel.loadMovies { [weak self] in
+            DispatchQueue.main.async {
+                self?.collectionView.reloadData()
+            }
+        }
+    }
+}
+
+extension MovieTableViewCell: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return movieTableViewCellViewModel.numberOfMovies()
-      }
-      
-      func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-          
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! MovieCollectionViewCell
-          cell.image(url: movieTableViewCellViewModel.get(at: indexPath.row))
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        guard let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: MovieCollectionViewCell.reuseIdentifier,
+            for: indexPath
+        ) as? MovieCollectionViewCell else {
+            return UICollectionViewCell()
+        }
+        
+        let imageURL = movieTableViewCellViewModel.get(at: indexPath.row)
+        cell.image(url: imageURL)
         cell.setupPosterImageView()
         cell.contentView.backgroundColor = .clear
         return cell
-      }
-    
+    }
+}
+
+extension MovieTableViewCell: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let height = 187
-        let widht = 126
-        return CGSize(width: widht, height: height)
+        return CGSize(width: 126, height: 187)
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if delegate != nil {
-            delegate?.cellTapped(movie: movieTableViewCellViewModel.listGenreMovie[indexPath.row])
+        guard let delegate = delegate else { return }
+        let movie = movieTableViewCellViewModel.listGenreMovie[indexPath.row]
+        delegate.cellTapped(movie: movie)
+    }
+}
+
+extension MovieTableViewCell: ViewComposable {
+    func setupConstraints() {
+        collectionView.makeConstraints { builder in
+            builder
+                .top(to: Mylabel.bottomAnchor, constant: 10)
+                .leading(to: contentView.leadingAnchor)
+                .trailing(to: contentView.trailingAnchor)
+                .bottom(to: contentView.bottomAnchor)
+        }
+        
+        Mylabel.makeConstraints { builder in
+            builder
+                .top(to: contentView.topAnchor)
+                .leading(to: contentView.leadingAnchor, constant: 10)
         }
     }
-      
-    func reloadData() {
-        collectionView.reloadData()
+    
+    func setupViews() {
+        contentView.addSubview(Mylabel)
+        contentView.addSubview(collectionView)
     }
-      
-    
-    
 }

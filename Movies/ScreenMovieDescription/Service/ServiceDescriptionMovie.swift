@@ -45,24 +45,16 @@ class ServiceDescriptionMovie: DescriptionEndPoint {
                             movie = descriptionMovie
                           completion(resultMovieDescription.sucess(movie: movie))
                         } catch {
-                          if let data = data {
-                              let str = String(data: data, encoding: .utf8)
-                              print("Parse Error3", str as Any, error)
-                          } else {
-                            print("Parse Error3", error)
-                          }
-                        completion(resultMovieDescription.failure(error: Erro.parseError(error: "Erro no parse")))
+                            completion(resultMovieDescription.failure(error: Erro.parseError(error: error.localizedDescription)))
                         }
                     }
                 }
             }.resume()
-            print("TEM INTERNET")
-        }else if !Reachability.isConnectedToNetwork() {
+        } else if !Reachability.isConnectedToNetwork() {
             let alert = UIAlertController(title: " ", message: "", preferredStyle: .actionSheet)
             let ok = UIAlertAction(title: "OK", style: .default, handler: nil)
             alert.addAction(ok)
             alert.show(alert, sender: self)
-            print("NAO TEM INTERNET")
         }
     }
     
@@ -79,18 +71,10 @@ class ServiceDescriptionMovie: DescriptionEndPoint {
                     do {
                         guard let data = data else { return }
                         let movieRecommendations = try JSONDecoder().decode(ListMovie.self, from: data)
-                        print("RECOMMENDATION = " , movieRecommendations)
                         recommendations = movieRecommendations.results
                         completion(ResultRecommendation.sucess(movieRecommendation: recommendations))
                     } catch {
-                        if let data = data {
-                            let str = String(data: data, encoding: .utf8)
-                            print("DEUUU RUIMMM = ", error)
-                            print("Parse Error3", str as Any, error)
-                        } else {
-                            print("Parse Error3", error)
-                        }
-                        completion(ResultRecommendation.failure(error: Erro.parseError(error: "Erro no parse")))
+                        completion(ResultRecommendation.failure(error: Erro.parseError(error: error.localizedDescription)))
                     }
                 }
             }
@@ -113,13 +97,7 @@ class ServiceDescriptionMovie: DescriptionEndPoint {
                             movieVideo = video.results
                             completion(resultMovieVideo.sucess(movieVideo: movieVideo))
                     } catch {
-                        if let data = data {
-                            let str = String(data: data, encoding: .utf8)
-                            print("Parse Error3", str as Any, error)
-                        } else {
-                            print("Parse Error3", error)
-                        }
-                        completion(resultMovieVideo.failure(error: Erro.parseError(error: "Erro no parse")))
+                        completion(resultMovieVideo.failure(error: Erro.parseError(error: error.localizedDescription)))
                     }
                 }
             }

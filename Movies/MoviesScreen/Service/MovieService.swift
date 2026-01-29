@@ -30,120 +30,99 @@ enum Erro {
 
 class TheMovieDb: MovieEndPoint {
     
-    func fetchGenreMovie(id: Int, completion: @escaping ( _ result: resultGenreMovie) -> Void) {
-        var movie = [Movie]()
-        guard let url = URL(string: serviceGenreMovie(id: id))
-                   else {
-                       return
-               }
-               URLSession.shared.dataTask(with: url) { (data, _, error) in
-                   DispatchQueue.main.async {
-                       if error == nil {
-                           do {
-                               
-                               guard let data = data else {
-                                   return
-                               }
-                               
-                               let list =  try JSONDecoder().decode(ListMovie.self, from: data)
-                            print(list)
-                               movie = list.results
-                            completion(resultGenreMovie.sucess(movieList: movie))
-                           } catch  {
-                               if let data = data {
-                                   let str = String(bytes: data, encoding: .utf8)
-                                   print("Parse Error3", str as Any, error)
-                               } else {
-                                   print("Parse Error3", error)
-                               }
-                               completion(resultGenreMovie.failure(error: Erro.parseError(error: "Erro no Parse")))
-                           }
-                       }
-                   }
-               }.resume()
-    }
-    
-    func fetchNameGenre(completion: @escaping ( _ result: resultNameGenre) -> Void) {
-        var listGenres = [Genre]()
-        guard let url = URL(string: serviceNameGenre()) else {
-            return
-        }
-        URLSession.shared.dataTask(with: url) { (data, _, error) in
+    func fetchGenreMovie(id: Int, completion: @escaping (resultGenreMovie) -> Void) {
+
+        let queryItems = [
+            URLQueryItem(name: "language", value: "pt-BR"),
+            URLQueryItem(name: "sort_by", value: "popularity.desc"),
+            URLQueryItem(name: "include_adult", value: "false"),
+            URLQueryItem(name: "include_video", value: "false"),
+            URLQueryItem(name: "page", value: "\(id)")
+        ]
+
+        guard let request = ApiClient.makeRequest(
+            path: "/discover/movie",
+            queryItems: queryItems
+        ) else { return }
+
+        URLSession.shared.dataTask(with: request) { data, _, error in
             DispatchQueue.main.async {
-                if error == nil {
-                    do {
-                        
-                        guard let data = data else {
-                            return
-                        }
-                        
-                        let list =  try JSONDecoder().decode(GenreList.self, from: data)
-                        listGenres = list.genres
-                        completion(resultNameGenre.sucess(listGenre: listGenres))
-                    } catch  {
-                        if let data = data {
-                            let str = String(data: data, encoding: .utf8)
-                            print("Parse Error3", str as Any, error)
-                        } else {
-                            print("Parse Error3", error)
-                        }
-                        completion(resultNameGenre.failure(error: Erro.parseError(error: "Erro no Parse")))
-                    }
+                if let error = error {
+                    completion(.failure(error: .parseError(error: error.localizedDescription)))
+                    return
+                }
+
+                guard let data = data else { return }
+
+                do {
+                    let list = try JSONDecoder().decode(ListMovie.self, from: data)
+                    completion(.sucess(movieList: list.results))
+                } catch {
+                    completion(.failure(error: .parseError(error: "Erro no Parse")))
                 }
             }
         }.resume()
     }
     
-    func fetchMoviePopular(completion: @escaping (_ result: resultMoviePopular) -> Void) {
-        var moviePopular = [Movie]()
-        guard let url = URL(string: serviceMoviePopular())
-                          else {
-                              return
-                      }
-                      URLSession.shared.dataTask(with: url) { (data, _, error) in
-                          DispatchQueue.main.async {
-                              if error == nil {
-                                  do {
-                                      
-                                      guard let data = data else {
-                                          return
-                                      }
-                                      
-                                      let list =  try JSONDecoder().decode(ListMovie.self, from: data)
-                                   print(list)
-                                      moviePopular = list.results
-                                    completion(resultMoviePopular.sucess(popular: moviePopular))
-                                  } catch  {
-                                      if let data = data {
-                                          let str = String(bytes: data, encoding: .utf8)
-                                          print("Parse Error3", str as Any, error)
-                                      } else {
-                                          print("Parse Error3", error)
-                                      }
-                                      completion(resultMoviePopular.failure(error: Erro.parseError(error: "Erro no Parse")))
-                                  }
-                              }
-                          }
-                      }.resume()
-    }
-    
-}
+    func fetchNameGenre(completion: @escaping (resultNameGenre) -> Void) {
 
-extension TheMovieDb {
-    func serviceGenreMovie(id: Int) -> String {
-        let service = "https://api.themoviedb.org/3/discover/movie?api_key=68206fe24af296b2560c51089250d615&language=pt-BR&sort_by=popularity.desc&include_adult=false&include_video=false&page=\(id)"
-        
-        return service
+        let queryItems = [
+            URLQueryItem(name: "language", value: "pt-BR")
+        ]
+
+        guard let request = ApiClient.makeRequest(
+            path: "/genre/movie/list",
+            queryItems: queryItems
+        ) else { return }
+
+        URLSession.shared.dataTask(with: request) { data, _, error in
+            DispatchQueue.main.async {
+                if let error = error {
+                    completion(.failure(error: .parseError(error: error.localizedDescription)))
+                    return
+                }
+
+                guard let data = data else { return }
+
+                do {
+                    let list = try JSONDecoder().decode(GenreList.self, from: data)
+                    completion(.sucess(listGenre: list.genres))
+                } catch {
+                    completion(.failure(error: .parseError(error: "Erro no Parse")))
+                }
+            }
+        }.resume()
+    }
+
+    
+    func fetchMoviePopular(completion: @escaping (resultMoviePopular) -> Void) {
+
+        let queryItems = [
+            URLQueryItem(name: "language", value: "pt-BR")
+        ]
+
+        guard let request = ApiClient.makeRequest(
+            path: "/movie/popular",
+            queryItems: queryItems
+        ) else { return }
+
+        URLSession.shared.dataTask(with: request) { data, _, error in
+            DispatchQueue.main.async {
+                if let error = error {
+                    completion(.failure(error: .parseError(error: error.localizedDescription)))
+                    return
+                }
+
+                guard let data = data else { return }
+
+                do {
+                    let list = try JSONDecoder().decode(ListMovie.self, from: data)
+                    completion(.sucess(popular: list.results))
+                } catch {
+                    completion(.failure(error: .parseError(error: "Erro no Parse")))
+                }
+            }
+        }.resume()
     }
     
-    func serviceNameGenre() -> String {
-        let service = "https://api.themoviedb.org/3/genre/movie/list?api_key=68206fe24af296b2560c51089250d615&language=pt-BR"
-        
-        return service
-    }
-    
-    func serviceMoviePopular() -> String {
-        let service = "https://api.themoviedb.org/3/movie/popular?api_key=68206fe24af296b2560c51089250d615&language=pt-BR"
-        return service
-    }
 }

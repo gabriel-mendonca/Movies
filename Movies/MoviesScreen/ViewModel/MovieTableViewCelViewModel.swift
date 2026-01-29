@@ -13,19 +13,32 @@ protocol MovieCollectionViewCellDelegate: AnyObject {
     func cellTappedRecommendation(_ movie: Movie)
 }
 
-class MovieTableViewCellViewModel {
+/// Protocolo para melhorar testabilidade
+protocol MovieTableViewCellViewModelProtocol {
+    var listGenreMovie: [Movie] { get }
+    var id: Int { get set }
+    func numberOfMovies() -> Int
+    func get(at row: Int) -> String?
+    func loadMovies(completion: @escaping () -> Void)
+    func loadPopularMovies(completion: @escaping () -> Void)
+}
+
+class MovieTableViewCellViewModel: MovieTableViewCellViewModelProtocol {
     
-    var service: MovieEndPoint = TheMovieDb()
-    var listGenreMovie = [Movie]()
-    var id = 0
+    // MARK: - Properties
+    private(set) var listGenreMovie: [Movie] = []
+    var id: Int = 0
     weak var delegate: MovieCollectionViewCellDelegate?
-    var childCoordinator: MovieCoordinator
     
-    init(coordinator: MovieCoordinator) {
-        self.childCoordinator = coordinator
-        delegate = coordinator
+    private let service: MovieEndPoint
+    
+    // MARK: - Initialization
+    init(coordinator: MovieCoordinator? = nil, service: MovieEndPoint = TheMovieDb()) {
+        self.service = service
+        self.delegate = coordinator
     }
     
+    // MARK: - Public Methods
     func showMovieDescription(_ movie: Movie) {
         delegate?.cellTapped(movie: movie)
     }
@@ -37,36 +50,39 @@ class MovieTableViewCellViewModel {
     func numberOfMovies() -> Int {
         return listGenreMovie.count
     }
+    
     func get(at row: Int) -> String? {
+        guard row >= 0 && row < listGenreMovie.count else {
+            return nil
+        }
         return listGenreMovie[row].posterURL ?? ""
     }
     
-    func setupTableViewCell(completion: @escaping () -> Void) {
-        service.fetchGenreMovie(id: id) { (result) in
+    func loadMovies(completion: @escaping () -> Void) {
+        service.fetchGenreMovie(id: id) { [weak self] result in
             switch result {
             case .sucess(let movies):
-                self.listGenreMovie = movies
+                self?.listGenreMovie = movies
                 completion()
-            case .failure:
-                self.handleError()
+            case .failure(let error):
+                self?.handleError(error: error)
             }
         }
     }
     
-    func setupMoviePopular(completion: @escaping () -> Void){
-        service.fetchMoviePopular { (result) in
+    func loadPopularMovies(completion: @escaping () -> Void) {
+        service.fetchMoviePopular { [weak self] result in
             switch result {
-            case.sucess(let popular):
-                self.listGenreMovie = popular
+            case .sucess(let popular):
+                self?.listGenreMovie = popular
                 completion()
-            case.failure:
-                self.handleError()
+            case .failure(let error):
+                self?.handleError(error: error)
             }
         }
     }
     
-    func handleError() {
-        
+    private func handleError(error: Erro) {
+        // Implementar tratamento de erro adequado
     }
-    
 }

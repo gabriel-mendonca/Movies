@@ -18,7 +18,7 @@ class MovieDescriptionViewController: UIViewController,UIViewControllerTransitio
     var movieTableViewCellViewModel: MovieTableViewCellViewModel!
     private let layout = UICollectionViewFlowLayout()
     weak var delegate: MovieCollectionViewCellDelegate?
-  
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -36,33 +36,33 @@ class MovieDescriptionViewController: UIViewController,UIViewControllerTransitio
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
         if Reachability.isConnectedToNetwork() {
-        movieDescriptionViewModel.fetchMovieVideo {_ in
-            self.removeButton()
-        }
-        movieDescriptionViewModel.fetchMovieDescription(sucess: { (movieDescription) in
-            self.setup(description: movieDescription)
-            self.removeButtonMore()
-            self.setupContraints()
-            self.setTitleRecommendation()
-        }, failure: {})
-        
-        movieDescriptionViewModel.fetchMovieRecommendation { _ in
-            self.setupCollection()
-            self.collectionViewRecommendation.reloadData()
-        }
+            movieDescriptionViewModel.fetchMovieVideo {_ in
+                self.removeButton()
+            }
+            movieDescriptionViewModel.fetchMovieDescription(sucess: { (movieDescription) in
+                self.setup(description: movieDescription)
+                self.removeButtonMore()
+                self.setupView()
+                self.setTitleRecommendation()
+            }, failure: {})
+            
+            movieDescriptionViewModel.fetchMovieRecommendation { _ in
+                self.setupCollection()
+                self.collectionViewRecommendation.reloadData()
+            }
         } else {
             callErrorView()
         }
     }
     
-      init(movieDescriptionViewModel: MovieDescriptionViewModel) {
-          self.movieDescriptionViewModel = movieDescriptionViewModel
-          super.init(nibName: nil, bundle: nil)
-      }
-
-      required init?(coder: NSCoder) {
-          fatalError("init(coder:) has not been implemented")
-      }
+    init(movieDescriptionViewModel: MovieDescriptionViewModel) {
+        self.movieDescriptionViewModel = movieDescriptionViewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     func callErrorView() {
         let errorView = ScreenError()
@@ -70,12 +70,11 @@ class MovieDescriptionViewController: UIViewController,UIViewControllerTransitio
         errorView.frame = CGRect(x: 0, y: 0, width: self.view.frame.size.width, height: self.view.frame.height)
         view.addSubview(errorView)
     }
-      
+    
     
     lazy var scrollView: UIScrollView = {
-       var scroll = UIScrollView()
+        var scroll = UIScrollView()
         scroll.contentSize = CGSize(width: view.frame.width, height: view.frame.height)
-        view.addSubview(scroll)
         return scroll
     }()
     
@@ -90,22 +89,20 @@ class MovieDescriptionViewController: UIViewController,UIViewControllerTransitio
     }()
     
     lazy var stackView: UIStackView = {
-       var stack = UIStackView(arrangedSubviews: [tagline,releaseDate,synopse,recommendationTitle])
+        var stack = UIStackView(arrangedSubviews: [tagline,releaseDate,synopse,recommendationTitle])
         stack.alignment = .fill
         stack.spacing = 20
         stack.axis = .vertical
         stack.distribution = .equalSpacing
-        scrollView.addSubview(stack)
         return stack
     }()
     
     lazy var stackViewButtons: UIStackView = {
-       var stackButtons = UIStackView(arrangedSubviews: [viewTrailer,viewMore])
+        var stackButtons = UIStackView(arrangedSubviews: [viewTrailer,viewMore])
         stackButtons.heightAnchor.constraint(equalToConstant: 70).isActive = true
         stackButtons.axis = .horizontal
         stackButtons.distribution = .fillEqually
         stackButtons.alignment = .fill
-        scrollView.addSubview(stackButtons)
         return stackButtons
     }()
     
@@ -115,37 +112,32 @@ class MovieDescriptionViewController: UIViewController,UIViewControllerTransitio
         collection.backgroundColor = .clear
         layout.scrollDirection = .horizontal
         layout.sectionInset = UIEdgeInsets(top: 10, left: 5, bottom: 5, right: 0)
-        scrollView.addSubview(collection)
         return collection
     }()
     
     lazy var backdrop: UIImageView = {
-       var image = UIImageView()
+        var image = UIImageView()
         scrollView.addSubview(image)
         return image
     }()
     
     lazy var backButton: UIButton = {
-       var back = UIButton()
-//        back.setImage(UIImage(named: "backButton"), for: .normal)
+        var back = UIButton()
         back.setTitle("voltar", for: .normal)
         back.tintColor = UIColor.white
         back.addTarget(self, action: #selector(backPage), for: .touchUpInside)
-        scrollView.addSubview(back)
         return back
     }()
     
     lazy var closeButton: UIButton = {
-       var close = UIButton()
+        var close = UIButton()
         close.setImage(UIImage(named: "closeButton"), for: .normal)
         close.addTarget(self, action: #selector(exitDetails), for: .touchUpInside)
-        scrollView.addSubview(close)
         return close
     }()
     
     lazy var poster: UIImageView = {
-       var posterImage = UIImageView()
-        scrollView.addSubview(posterImage)
+        var posterImage = UIImageView()
         return posterImage
     }()
     
@@ -155,7 +147,6 @@ class MovieDescriptionViewController: UIViewController,UIViewControllerTransitio
         label.font = UIFont(name: "Kefa", size: 20.0)
         label.lineBreakMode = .byWordWrapping
         label.numberOfLines = 0
-        scrollView.addSubview(label)
         return label
     }()
     
@@ -163,7 +154,6 @@ class MovieDescriptionViewController: UIViewController,UIViewControllerTransitio
         var label = UILabel()
         label.textColor = .white
         label.font = UIFont(name: "System", size: 17.0)
-        scrollView.addSubview(label)
         return label
     }()
     
@@ -200,10 +190,9 @@ class MovieDescriptionViewController: UIViewController,UIViewControllerTransitio
     }()
     
     lazy var more: UIButton = {
-       var button = UIButton()
+        var button = UIButton()
         button.setImage(#imageLiteral(resourceName: "plus"), for: .normal)
         button.addTarget(self, action: #selector(actionMore), for: .touchUpInside)
-        viewMore.addSubview(button)
         return button
     }()
     
@@ -211,29 +200,27 @@ class MovieDescriptionViewController: UIViewController,UIViewControllerTransitio
         var video = UIButton()
         video.setImage(#imageLiteral(resourceName: "youtubeButton"), for: .normal)
         video.addTarget(self, action: #selector(play), for: .touchUpInside)
-        viewTrailer.addSubview(video)
         return video
     }()
     
     lazy var recommendationTitle: UILabel = {
-       var titleRecommendation = UILabel()
+        var titleRecommendation = UILabel()
         titleRecommendation.textColor = .white
         titleRecommendation.font = UIFont(name: "Kefa", size: 19)
         titleRecommendation.font = .boldSystemFont(ofSize: 19)
         titleRecommendation.lineBreakMode = .byWordWrapping
-        scrollView.addSubview(titleRecommendation)
         return titleRecommendation
     }()
     
     func setTitleRecommendation() {
         
         recommendationTitle.text = "Recomendações:"
-//        movieDescriptionViewModel.fetchMovieDescription { (movieDescrition) in
+        movieDescriptionViewModel.fetchMovieDescription { (movieDescrition) in
             let fontSize: CGFloat = 19
             let text = NSMutableAttributedString(string: "Recomendação para: ", attributes: [.font: UIFont.systemFont(ofSize: fontSize, weight: .bold)])
-//            text.append(NSAttributedString(string: movieDescrition.title ?? "untitle", attributes: [.font: UIFont.systemFont(ofSize: fontSize, weight: .regular)]))
-//            self.recommendationTitle.attributedText = text
-//        } failure: {}
+            text.append(NSAttributedString(string: movieDescrition.title ?? "untitle", attributes: [.font: UIFont.systemFont(ofSize: fontSize, weight: .regular)]))
+            self.recommendationTitle.attributedText = text
+        } failure: {}
     }
     
     @objc private func play() {
@@ -274,6 +261,28 @@ class MovieDescriptionViewController: UIViewController,UIViewControllerTransitio
         
     }
     
+    func setupView() {
+        setupHierarchy()
+    }
+    
+    func setupHierarchy() {
+        view.addSubview(scrollView)
+        scrollView.addSubview(stackView)
+        scrollView.addSubview(stackViewButtons)
+        scrollView.addSubview(recommendationTitle)
+        scrollView.addSubview(collectionViewRecommendation)
+        scrollView.addSubview(backdrop)
+        scrollView.addSubview(backButton)
+        scrollView.addSubview(closeButton)
+        scrollView.addSubview(poster)
+        scrollView.addSubview(titleMovie)
+        scrollView.addSubview(evaluation)
+        viewMore.addSubview(more)
+        viewTrailer.addSubview(trailer)
+        
+        setupContraints()
+    }
+    
     private func setupContraints() {
         
         titleMovie.translatesAutoresizingMaskIntoConstraints = false
@@ -281,7 +290,6 @@ class MovieDescriptionViewController: UIViewController,UIViewControllerTransitio
         let leadingTitle = titleMovie.leadingAnchor.constraint(equalTo: poster.trailingAnchor,constant: 8)
         let trailingTitle = titleMovie.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor,constant: -20)
         NSLayoutConstraint.activate([topTitle,leadingTitle,trailingTitle])
-        scrollView.addSubview(titleMovie)
         
         backdrop.translatesAutoresizingMaskIntoConstraints = false
         let top = backdrop.topAnchor.constraint(equalTo: scrollView.topAnchor)
@@ -290,7 +298,6 @@ class MovieDescriptionViewController: UIViewController,UIViewControllerTransitio
         let height = backdrop.heightAnchor.constraint(equalToConstant: 200)
         let widht = backdrop.widthAnchor.constraint(equalToConstant: view.frame.width)
         NSLayoutConstraint.activate([top,leading,trailing,height,widht])
-        scrollView.addSubview(backdrop)
         
         backButton.translatesAutoresizingMaskIntoConstraints = false
         let topBack = backButton.topAnchor.constraint(equalTo: backdrop.topAnchor, constant: 10)
@@ -298,7 +305,6 @@ class MovieDescriptionViewController: UIViewController,UIViewControllerTransitio
         let heigthBack = backButton.heightAnchor.constraint(equalToConstant: 30)
         let widhtBack = backButton.widthAnchor.constraint(equalToConstant: 60)
         NSLayoutConstraint.activate([topBack,leadindBack,heigthBack,widhtBack])
-        scrollView.addSubview(backButton)
         
         closeButton.translatesAutoresizingMaskIntoConstraints = false
         let topButton = closeButton.topAnchor.constraint(equalTo: backdrop.topAnchor, constant: 10)
@@ -306,7 +312,6 @@ class MovieDescriptionViewController: UIViewController,UIViewControllerTransitio
         let heightButton = closeButton.heightAnchor.constraint(equalToConstant: 30)
         let widhtButton = closeButton.widthAnchor.constraint(equalToConstant: 30)
         NSLayoutConstraint.activate([topButton, trailingButton,heightButton,widhtButton])
-        scrollView.addSubview(closeButton)
         
         poster.translatesAutoresizingMaskIntoConstraints = false
         let topPoster = poster.topAnchor.constraint(equalTo: backdrop.bottomAnchor,constant: -20)
@@ -314,7 +319,6 @@ class MovieDescriptionViewController: UIViewController,UIViewControllerTransitio
         let heightPoster = poster.heightAnchor.constraint(equalToConstant: 161)
         let widhtPoster = poster.widthAnchor.constraint(equalToConstant: 123)
         NSLayoutConstraint.activate([topPoster,leadingPoster,heightPoster,widhtPoster])
-        scrollView.addSubview(poster)
         
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         let topScroll = scrollView.topAnchor.constraint(equalTo: view.topAnchor)
@@ -323,28 +327,24 @@ class MovieDescriptionViewController: UIViewController,UIViewControllerTransitio
         let bottom = scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         let heightScroll = scrollView.heightAnchor.constraint(equalToConstant: 1000.0)
         NSLayoutConstraint.activate([topScroll,leadingScroll,trailingScroll,bottom,heightScroll])
-        view.addSubview(scrollView)
         
         evaluation.translatesAutoresizingMaskIntoConstraints = false
         let topEvaluation = evaluation.topAnchor.constraint(equalTo: titleMovie.bottomAnchor,constant: 10)
         let leadingEvaluation = evaluation.leadingAnchor.constraint(equalTo: poster.trailingAnchor,constant: 8)
         let width = evaluation.widthAnchor.constraint(equalToConstant: 94)
         NSLayoutConstraint.activate([topEvaluation,leadingEvaluation,width])
-        scrollView.addSubview(evaluation)
         
         stackView.translatesAutoresizingMaskIntoConstraints = false
         let topStack = stackView.topAnchor.constraint(equalTo: poster.bottomAnchor,constant: 20)
         let leadingStack = stackView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor,constant: 20)
         let trailingStack = stackView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor,constant: -20)
         NSLayoutConstraint.activate([topStack,leadingStack,trailingStack])
-        scrollView.addSubview(stackView)
         
         collectionViewRecommendation.translatesAutoresizingMaskIntoConstraints = false
         let topCollection = collectionViewRecommendation.topAnchor.constraint(equalTo: stackView.bottomAnchor,constant: 5)
         let leadingCollection = collectionViewRecommendation.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor)
         let trailingCollection = collectionViewRecommendation.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor)
         NSLayoutConstraint.activate([topCollection,leadingCollection,trailingCollection])
-        scrollView.addSubview(collectionViewRecommendation)
         
         stackViewButtons.translatesAutoresizingMaskIntoConstraints = false
         let topStackButtons = stackViewButtons.topAnchor.constraint(equalTo: collectionViewRecommendation.bottomAnchor, constant: 20)
@@ -352,7 +352,6 @@ class MovieDescriptionViewController: UIViewController,UIViewControllerTransitio
         let trailingStackButtons = stackViewButtons.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor,constant: -20)
         let bottomStackButtons = stackViewButtons.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor, constant: -20)
         NSLayoutConstraint.activate([topStackButtons,leadingStackButtons,trailingStackButtons,bottomStackButtons])
-        scrollView.addSubview(stackViewButtons)
         
         more.translatesAutoresizingMaskIntoConstraints = false
         let topMore = more.topAnchor.constraint(equalTo: viewMore.topAnchor)
@@ -360,7 +359,6 @@ class MovieDescriptionViewController: UIViewController,UIViewControllerTransitio
         let widhtMore = more.widthAnchor.constraint(equalToConstant: 70)
         let bottomMore = more.bottomAnchor.constraint(equalTo: viewMore.bottomAnchor)
         NSLayoutConstraint.activate([topMore,moreCenterX,widhtMore,bottomMore])
-        viewMore.addSubview(more)
 
         trailer.translatesAutoresizingMaskIntoConstraints = false
         let topVideo = trailer.topAnchor.constraint(equalTo: viewTrailer.topAnchor)
@@ -368,7 +366,6 @@ class MovieDescriptionViewController: UIViewController,UIViewControllerTransitio
         let widhtVideo = trailer.widthAnchor.constraint(equalToConstant: 70)
         let bottomVideo = trailer.bottomAnchor.constraint(equalTo: viewTrailer.bottomAnchor)
         NSLayoutConstraint.activate([topVideo,videoCenterX,widhtVideo,bottomVideo])
-        viewTrailer.addSubview(trailer)
         
     }
     
@@ -424,37 +421,23 @@ class MovieDescriptionViewController: UIViewController,UIViewControllerTransitio
     }
     
     private func ageRange(parentalRating: Bool?) {
-        if parentalRating == true {
-            ageRange.image = UIImage(named: "proibido")
-        } else {
-            ageRange.image = UIImage(named: "livre")
-        }
+        let imageName = (parentalRating ?? false) ? "proibido" : "livre"
+        ageRange.image = UIImage(named: imageName)
     }
     
     private func starEvaluation(nota: Float?) {
-        
         guard let nota = nota else {
+            evaluation.text = "☆☆☆☆☆"
             return
         }
-        let media = Int(nota/2)
-        if media <= 1 {
-            evaluation.text = "★☆☆☆☆"
-        } else if media <= 2 {
-            evaluation.text = "★★☆☆☆"
-        } else if media <= 3 {
-            evaluation.text = "★★★☆☆"
-        } else if media <= 4 {
-            evaluation.text = "★★★★☆"
-        } else if media <= 5 {
-            evaluation.text = "★★★★★"
-        } else {
-            evaluation.text = "☆☆☆☆☆"
-        }
+
+        let media = max(0, min(5, Int(nota / 2)))
         
+        let estrelasPreenchidas = String(repeating: "★", count: media)
+        let estrelasVazias = String(repeating: "☆", count: 5 - media)
+        
+        evaluation.text = estrelasPreenchidas + estrelasVazias
     }
-    
-    
-    
 }
 
 extension MovieDescriptionViewController: UICollectionViewDelegate,UICollectionViewDataSource,UICollectionViewDelegateFlowLayout {
@@ -464,17 +447,13 @@ extension MovieDescriptionViewController: UICollectionViewDelegate,UICollectionV
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! MovieRecommendationCollectionViewCell
-        cell.setImage(movieRecommendation: movieDescriptionViewModel.recommendation[indexPath.row])
-        cell.setupContraints()
+        cell.setupView(url: movieDescriptionViewModel.recommendation[indexPath.row].posterURL ?? "")
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let recommendation = movieDescriptionViewModel.recommendation[indexPath.row].id ?? 0
         movieDescriptionViewModel.sendMovieRecommendation(id: recommendation)
-//        let movieDescriptionViewModel = MovieDescriptionViewModel(id: recommendation)
-//        let movieDescriptionViewController = MovieDescriptionViewController(movieDescriptionViewModel: movieDescriptionViewModel)
-//        navigationController?.pushViewController(movieDescriptionViewController, animated: true)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {

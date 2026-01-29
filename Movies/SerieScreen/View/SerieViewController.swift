@@ -11,12 +11,19 @@ import UIKit
 
 class SerieViewController: UIViewController,UITableViewDataSource,UITableViewDelegate, SerieCollectionViewCellDelegate {
   
-    var serieViewModel: SerieViewModel = SerieViewModel()
-    var serieTableViewCellViewModel: SerieTableViewCellViewModel!
+    var serieViewModel: SerieViewModel
+    var serieTableViewCellViewModel: SerieTableViewCellViewModel
+    
+    lazy var tableView: UITableView = {
+       var table = UITableView()
+      table.allowsSelection = false
+      table.backgroundColor = .black
+        return table
+    }()
    
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        view.backgroundColor = .black
         setupTableViewContraints()
         setupSerieTableView()
     }
@@ -24,15 +31,16 @@ class SerieViewController: UIViewController,UITableViewDataSource,UITableViewDel
     override func viewWillAppear(_ animated: Bool) {
         hideNavigationBar(animated)
         super.viewWillAppear(animated)
-        serieViewModel.setupSerieTableView {
+        serieViewModel.setupSerieTableView { [weak self] in
             DispatchQueue.main.async {
-                self.tableView.reloadData()
+                self?.tableView.reloadData()
             }
         }
     }
     
-    init(viewModel: SerieTableViewCellViewModel) {
+    init(viewModel: SerieTableViewCellViewModel, serieViewModel: SerieViewModel = SerieViewModel()) {
         self.serieTableViewCellViewModel = viewModel
+        self.serieViewModel = serieViewModel
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -40,26 +48,19 @@ class SerieViewController: UIViewController,UITableViewDataSource,UITableViewDel
         fatalError("init(coder:) has not been implemented")
     }
     
-      lazy var tableView: UITableView = {
-         var table = UITableView()
-        table.allowsSelection = false
-        table.backgroundColor = .black
-          view.addSubview(table)
-          return table
-      }()
-    
     func cellTapped(_ model: Serie) {
         serieTableViewCellViewModel.showSeries(model: model)
     }
   
     func setupTableViewContraints() {
+        view.addSubview(tableView)
+        
         tableView.translatesAutoresizingMaskIntoConstraints = false
         let top = tableView.topAnchor.constraint(equalTo: view.topAnchor)
         let bottom = tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         let leading = tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor)
         let trailing = tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         NSLayoutConstraint.activate([top,bottom,leading,trailing])
-        view.addSubview(tableView)
     }
         
         func setupSerieTableView() {
@@ -77,17 +78,15 @@ class SerieViewController: UIViewController,UITableViewDataSource,UITableViewDel
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return serieViewModel.numberOfSerie()
        }
-       
-       func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! SerieTableViewCell
-        cell.cellConfigurate(name: serieViewModel.getSerie(at: indexPath.row).0)
-        cell.serieTableViewCellViewModel.id = serieViewModel.getSerie(at: indexPath.row).1
-        cell.setupSerieCollectionView(view: self)
-        cell.delegate = self
-        cell.setupSerieCollectionViewContraints()
-        cell.backgroundColor = .black
+        cell.setupView(serieTableViewCellViewModel: serieTableViewCellViewModel,
+                       nameTitle: serieViewModel.getSerie(at: indexPath.row).0,
+                       delegate: self)
+        self.serieTableViewCellViewModel.id = serieViewModel.getSerie(at: indexPath.row).1
         return cell
-       }
+    }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 250

@@ -9,11 +9,15 @@
 import Foundation
 import UIKit
 
-class SearchCollectionViewCell: UICollectionViewCell {
+protocol SearchCollectionViewDelegate: AnyObject {
+    func cellTapped(search: MovieSearch)
+    func cellTappedSerie(serie: Serie)
+}
+
+final class SearchCollectionViewCell: UICollectionViewCell {
     
     lazy var poster: UIImageView = {
        var image = UIImageView()
-        addSubview(image)
         return image
     }()
     
@@ -21,11 +25,28 @@ class SearchCollectionViewCell: UICollectionViewCell {
         var activty = UIActivityIndicatorView(style: UIActivityIndicatorView.Style.medium)
         activty.startAnimating()
         activty.color = .white
-        contentView.addSubview(activty)
         return activty
     }()
     
-    func setupImageViewConstraints() {
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        contentView.subviews.forEach({ $0.removeFromSuperview() })
+    }
+    
+    func setupView(url: String?) {
+        image(url: url)
+        setupHierarchy()
+        cornerRadiusPoster()
+    }
+    
+    private func setupHierarchy() {
+        contentView.addSubview(poster)
+        contentView.addSubview(activity)
+        
+        setupImageViewConstraints()
+    }
+    
+    private func setupImageViewConstraints() {
         
         poster.translatesAutoresizingMaskIntoConstraints = false
         let top = poster.topAnchor.constraint(equalTo: contentView.topAnchor)
@@ -33,34 +54,22 @@ class SearchCollectionViewCell: UICollectionViewCell {
         let trailing = poster.trailingAnchor.constraint(equalTo: contentView.trailingAnchor)
         let bottom = poster.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
         NSLayoutConstraint.activate([top,leading,trailing,bottom])
-        contentView.addSubview(poster)
         
         activity.translatesAutoresizingMaskIntoConstraints = false
         let centerX = activity.centerXAnchor.constraint(equalTo: contentView.centerXAnchor)
         let centerY = activity.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
         NSLayoutConstraint.activate([centerX,centerY])
-        contentView.addSubview(activity)
         
     }
     
-    func image(url: String?) {
+    private func image(url: String?) {
         poster.renderImageView(urlImage: url ?? "")
         self.activity.stopAnimating()
         self.cornerRadiusPoster()
     }
     
-    func cornerRadiusPoster() {
-        poster.clipsToBounds = true
-        poster.layer.cornerRadius = poster.frame.size.width/12.5
+    private func cornerRadiusPoster() {
+        contentView.clipsToBounds = true
+        contentView.layer.cornerRadius = contentView.frame.size.width/AppConstants.UI.posterCornerRadiusDivisor
     }
-    
-    override func prepareForReuse() {
-        poster.image = nil
-    }
-    
-}
-
-protocol SearchCollectionViewDelegate: AnyObject {
-    func cellTapped(search: MovieSearch)
-    func cellTappedSerie(serie: Serie)
 }
